@@ -23,15 +23,13 @@ export default function AdminAssignMentor() {
       setIsLoading(true);
       try {
         const response = await API.get("/admin/users");
-
-        console.log("Fetched userss:", response.data);
-
         setUsers(response.data);
+        toast.success("Users loaded successfully");
       } catch (error: any) {
-        console.error("Failed to load users or mentors", error);
-        const message =
-          error?.response?.data?.message || "Error loading users or mentors";
-        toast.error(message);
+        console.error("Failed to load users", error);
+        toast.error(
+          error?.response?.data?.message || "Error loading users or mentors"
+        );
       } finally {
         setIsLoading(false);
       }
@@ -45,7 +43,6 @@ export default function AdminAssignMentor() {
       toast.error("Admin not logged in.");
       return;
     }
-    console.log("Assigning:", { menteeId, mentorId, adminId });
 
     try {
       const response = await API.post("/admin/assign-mentor", {
@@ -57,52 +54,59 @@ export default function AdminAssignMentor() {
       toast.success(response?.data?.message || "Mentor assigned successfully");
     } catch (error: any) {
       console.error("Assignment failed", error);
-      const message =
-        error?.response?.data?.message || "Assignment failed. Try again.";
-      toast.error(message);
+      toast.error(
+        error?.response?.data?.message || "Assignment failed. Try again."
+      );
     }
   };
 
+  const mentors = users.filter((u) => u.role === "mentor");
+  const mentees = users.filter((u) => u.role === "mentee");
+
   return (
-    <div className="p-4 space-y-6 ">
-      <h2 className="text-xl font-bold mb-4">Assign Mentors to Mentees</h2>
+    <div className="max-w-5xl mx-auto p-6">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">
+        Assign Mentors to Mentees
+      </h2>
 
       {isLoading ? (
-        <p>Loading users....</p>
-      ) : users.length > 0 ? (
-        users
-          .filter((user) => user.role === "mentee")
-          .map((mentee) => (
+        <p className="text-gray-600">Loading users...</p>
+      ) : mentees.length > 0 ? (
+        <div className="space-y-4">
+          {mentees.map((mentee) => (
             <div
               key={mentee.id}
-              className="border p-4 rounded shadow-sm flex items-center justify-between bg-blue-400"
+              className="border border-gray-300 bg-white rounded-lg p-4 flex justify-between items-center shadow-sm"
             >
               <div>
-                <p className="font-semibold">{mentee.username}</p>
-                <p className="text-sm text-white">{mentee.email}</p>
-                <p className="text-sm text-white">{mentee.role}</p>
-                <p className="text-xs text-white">ID: {mentee.id}</p>
+                <p className="text-lg font-semibold text-gray-800">
+                  {mentee.username}
+                </p>
+                <p className="text-sm text-gray-600">{mentee.email}</p>
+                <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
+                  Role: {mentee.role}
+                </span>
               </div>
+
               <div className="flex items-center gap-2">
                 <select
                   value={assignments[mentee.id] || ""}
                   onChange={(e) => handleAssign(mentee.id, e.target.value)}
-                  className="border px-2 py-1 rounded"
+                  className="border border-gray-300 px-3 py-2 rounded text-sm bg-white focus:outline-none focus:ring focus:ring-blue-300"
                 >
-                  <option value="" className="bg-inherit">Select Mentor</option>
-                  {users
-                    .filter((mentor) => mentor.role === "mentor")
-                    .map((mentor) => (
-                      <option key={mentor.id} value={mentor.id}>
-                        {mentor.username}
-                      </option>
-                    ))}
+                  <option value="">Select Mentor</option>
+                  {mentors.map((mentor) => (
+                    <option key={mentor.id} value={mentor.id}>
+                      {mentor.username}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
-          ))
+          ))}
+        </div>
       ) : (
-        <p>No mentees available for assignment.</p>
+        <p className="text-gray-500">No mentees available for assignment.</p>
       )}
     </div>
   );

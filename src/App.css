@@ -1,1 +1,17 @@
 @import "tailwindcss";
+
+.dashboard-link {
+    @apply flex items-center gap-2 px-3 py-2 rounded transition border-black border-2 hover:bg-white/20 text-black;
+}
+
+.dashboard-card {
+    @apply bg-white p-6 rounded-xl shadow-md border border-green-200 hover:shadow-lg transition duration-200 ease-in-out;
+}
+
+.dashboard-card {
+    @apply bg-white p-6 rounded-xl shadow-md border border-purple-200 hover:shadow-lg transition duration-200 ease-in-out;
+}
+
+.dashboard-card {
+    @apply bg-white p-6 rounded-xl shadow-md border border-blue-200 hover:shadow-lg transition duration-200;
+}

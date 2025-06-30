@@ -17,6 +17,7 @@ import UpdateProfile from "./utils/updateProfile";
 import "react-toastify/dist/ReactToastify.css";
 import MentorAvailabilityForm from "./utils/mentor/mentorAvailabilityForm";
 import ManageRequests from "./utils/mentor/manageRequests";
+import ViewMentors from "./utils/mentee/viewMentors";
 // import SessionBookingForm from "./utils/sessionBookingForm";
 
 function AppRoutes() {
@@ -79,6 +80,22 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/dashboard/mentee"
+        element={
+          <DashboardLayout>
+            <MenteeDashboard />
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/dashboard/mentee/view-mentors"
+        element={
+          <DashboardLayout>
+            <ViewMentors />
+          </DashboardLayout>
+        }
+      />
+      <Route
         path="/dashboard/mentor/availability"
         element={
           <DashboardLayout>
@@ -87,7 +104,7 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/dashboard/mentor/sessions"
+        path="/dashboard/mentor/sessions/:mentorId"
         element={
           <DashboardLayout>
             <ManageRequests />

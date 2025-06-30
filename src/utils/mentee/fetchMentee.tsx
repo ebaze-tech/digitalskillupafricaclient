@@ -9,13 +9,13 @@ interface Mentee {
   email: string;
   role?: string;
 }
+
 export default function FetchMentee() {
-  const [mentee, setMentor] = useState<Mentee | null>(null);
+  const [mentee, setMentee] = useState<Mentee | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const { user } = useAuth();
 
   const menteeId = user?.roleId;
-  console.log(menteeId);
 
   useEffect(() => {
     if (!menteeId) return;
@@ -24,8 +24,8 @@ export default function FetchMentee() {
       setLoading(true);
       try {
         const response = await API.get(`/mentorship/mentee/info/${menteeId}`);
-        setMentor(response.data);
-        toast.success(response?.data?.message);
+        setMentee(response.data);
+        toast.success("Mentee profile loaded");
       } catch (error: any) {
         console.error("Error fetching mentee data", error);
         const message =
@@ -38,25 +38,27 @@ export default function FetchMentee() {
 
     fetchMentee();
   }, [menteeId]);
-  console.log(mentee);
 
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4 text-black">
-        {mentee ? `Welcome, ${mentee?.username}` : "Mentor Dashboard"}
+    <div className="max-w-xl mx-auto p-6">
+      <h2 className="text-2xl font-bold mb-4 text-gray-800">
+        {mentee ? `Welcome, ${mentee.username}` : "Mentee Dashboard"}
       </h2>
 
       {loading ? (
-        <p className="text-gray-500">Loading mentee dashboard...</p>
+        <p className="text-gray-500">Loading your details...</p>
       ) : !mentee ? (
-        <p className="text-red-500">Mentor details not found.</p>
+        <p className="text-red-500">Mentee details not found.</p>
       ) : (
-        <div className="bg-inherit rounded shadow p-6 border border-black">
-          <p className="text-lg font-semibold text-black">{mentee?.username}</p>
-          <p className="text-sm text-white">User ID: {mentee?.userId}</p>
-          {mentee?.role && (
-            <p className="text-sm text-blue-600 font-medium">
-              Role: {mentee?.role}
+        <div className="bg-white border border-gray-300 rounded shadow p-6 space-y-2">
+          <p className="text-lg font-semibold text-gray-800">
+            {mentee.username}
+          </p>
+          <p className="text-sm text-gray-600">Email: {mentee.email}</p>
+          <p className="text-sm text-gray-600">User ID: {mentee.userId}</p>
+          {mentee.role && (
+            <p className="text-sm font-medium text-blue-600">
+              Role: {mentee.role}
             </p>
           )}
         </div>

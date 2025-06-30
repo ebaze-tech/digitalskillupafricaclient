@@ -14,15 +14,13 @@ export default function MentorDashboard() {
           <MentorAvailabilityForm />
         </div>
 
-        <div className="bg-inherit p-4 rounded-xl shadow-md border border-black">
-          <ManageRequests />
-        </div>
-
         {/* <div className="bg-inherit p-4 rounded-xl shadow-md border border-black">
           <AdminViewSessions />
         </div>*/}
+      </div>{" "}
+      <div className="bg-inherit p-4 rounded-xl shadow-md border border-black">
+        <ManageRequests />
       </div>
-
       {/* <div className="bg-inherit p-4 rounded-xl shadow-md border border-black">
         <AdminFetchUsers />
       </div> */}
