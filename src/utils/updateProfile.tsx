@@ -64,13 +64,11 @@ export default function UpdateProfile() {
         experience: formData.experience,
         availability: formData.availability,
       };
-      console.log(payload);
 
       await API.put(`/profile/setup`, payload);
 
-      if (!user) {
-        throw new Error("User is not authenticated");
-      }
+      if (!user) throw new Error("User is not authenticated");
+
       const updatedUser = {
         ...user,
         ...payload,
@@ -84,15 +82,16 @@ export default function UpdateProfile() {
       localStorage.setItem("user", JSON.stringify(updatedUser));
       login(updatedUser);
 
-      toast.success("Profile updated successfully");
+      toast.success("✅ Profile updated successfully");
 
-      if (user?.role === "mentor") {
-        navigate("/dashboard/mentor");
-      } else if (user?.role === "mentee") {
-        navigate("/dashboard/mentee");
-      } else {
-        navigate("/dashboard/admin");
-      }
+      const redirectPath =
+        user?.role === "mentor"
+          ? "/dashboard/mentor"
+          : user?.role === "mentee"
+          ? "/dashboard/mentee"
+          : "/dashboard/admin";
+
+      navigate(redirectPath);
     } catch (error: any) {
       const msg = error?.response?.data?.message || "Failed to update profile";
       toast.error(msg);
@@ -102,122 +101,136 @@ export default function UpdateProfile() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-purple-100 px-4 py-10">
-      <div className="w-full max-w-2xl bg-white p-6 rounded-lg shadow-xl">
-        <h2 className="text-2xl font-bold text-indigo-700 mb-6 text-center">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-white to-purple-100 flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-2xl bg-white p-8 rounded-xl shadow-lg">
+        <h2 className="text-3xl font-extrabold text-center text-indigo-700 mb-8">
           Complete Your Profile
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Readonly fields */}
-          <div>
-            <label className="text-sm font-medium text-gray-700">
-              Username
-            </label>
-            <input
-              name="username"
-              value={formData.username}
-              readOnly
-              className="w-full px-4 py-2 bg-gray-100 border rounded focus:outline-none cursor-not-allowed"
-            />
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Read-only Fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-600">
+                Username
+              </label>
+              <input
+                name="username"
+                value={formData.username}
+                readOnly
+                className="w-full bg-gray-100 text-gray-500 border px-4 py-2 rounded cursor-not-allowed"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-600">
+                Email
+              </label>
+              <input
+                name="email"
+                value={formData.email}
+                readOnly
+                className="w-full bg-gray-100 text-gray-500 border px-4 py-2 rounded cursor-not-allowed"
+              />
+            </div>
           </div>
 
-          <div>
-            <label className="text-sm font-medium text-gray-700">Email</label>
-            <input
-              name="email"
-              value={formData.email}
-              readOnly
-              className="w-full px-4 py-2 bg-gray-100 border rounded focus:outline-none cursor-not-allowed"
-            />
-          </div>
+          {/* Editable Fields */}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Short Bio
+              </label>
+              <textarea
+                name="shortBio"
+                value={formData.shortBio}
+                onChange={handleChange}
+                required
+                rows={3}
+                className="w-full border px-4 py-2 rounded focus:ring-indigo-500 focus:outline-none"
+                placeholder="Tell us a bit about yourself..."
+              />
+            </div>
 
-          {/* Editable fields */}
-          <div>
-            <label className="text-sm font-medium text-gray-700">
-              Short Bio
-            </label>
-            <textarea
-              name="shortBio"
-              value={formData.shortBio}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
-              rows={3}
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Goals
+              </label>
+              <textarea
+                name="goals"
+                value={formData.goals}
+                onChange={handleChange}
+                required
+                rows={3}
+                className="w-full border px-4 py-2 rounded focus:ring-indigo-500 focus:outline-none"
+                placeholder="What are your mentorship goals?"
+              />
+            </div>
 
-          <div>
-            <label className="text-sm font-medium text-gray-700">Goals</label>
-            <textarea
-              name="goals"
-              value={formData.goals}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
-              rows={3}
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Skills
+              </label>
+              <input
+                name="skills"
+                value={formData.skills}
+                onChange={handleChange}
+                required
+                placeholder="e.g. JavaScript, React, Node.js"
+                className="w-full border px-4 py-2 rounded focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
 
-          <div>
-            <label className="text-sm font-medium text-gray-700">Skills</label>
-            <input
-              name="skills"
-              value={formData.skills}
-              onChange={handleChange}
-              required
-              placeholder="e.g. JavaScript, React, Node.js"
-              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            />
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Industry
+                </label>
+                <input
+                  name="industry"
+                  value={formData.industry}
+                  onChange={handleChange}
+                  required
+                  className="w-full border px-4 py-2 rounded focus:ring-indigo-500 focus:outline-none"
+                />
+              </div>
 
-          <div>
-            <label className="text-sm font-medium text-gray-700">
-              Industry
-            </label>
-            <input
-              name="industry"
-              value={formData.industry}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            />
-          </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Experience
+                </label>
+                <input
+                  name="experience"
+                  value={formData.experience}
+                  onChange={handleChange}
+                  required
+                  className="w-full border px-4 py-2 rounded focus:ring-indigo-500 focus:outline-none"
+                />
+              </div>
 
-          <div>
-            <label className="text-sm font-medium text-gray-700">
-              Experience
-            </label>
-            <input
-              name="experience"
-              value={formData.experience}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-gray-700">
-              Availability
-            </label>
-            <input
-              name="availability"
-              value={formData.availability}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            />
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Availability
+                </label>
+                <input
+                  name="availability"
+                  value={formData.availability}
+                  onChange={handleChange}
+                  required
+                  className="w-full border px-4 py-2 rounded focus:ring-indigo-500 focus:outline-none"
+                />
+              </div>
+            </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded flex justify-center items-center gap-2 transition"
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition flex justify-center items-center gap-2"
           >
             {loading ? (
               <>
-                <Loader2 className="animate-spin w-4 h-4" />
+                <Loader2 className="animate-spin w-5 h-5" />
                 Updating...
               </>
             ) : (

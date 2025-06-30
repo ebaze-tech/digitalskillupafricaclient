@@ -19,7 +19,6 @@ export default function MentorAvailabilityForm() {
     const fetchMentorAvailability = async () => {
       try {
         const response = await API.get("/mentorship/availability/mentor");
-        console.log(response);
         const transformed = response.data.map((slot: any) => ({
           day: slot.day_of_week,
           start: slot.start_time,
@@ -61,10 +60,8 @@ export default function MentorAvailabilityForm() {
     setSuccess(null);
 
     try {
-      // Clear previous entries
       await API.delete("/mentorship/availability");
 
-      // Submit only valid entries
       const validSlots = availability.filter((a) => a.start && a.end);
       for (const slot of validSlots) {
         await API.post("/mentorship/availability", {
@@ -88,55 +85,66 @@ export default function MentorAvailabilityForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-xl">
-      <h2 className="text-2xl font-bold text-black mb-4">
+    <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-md border border-gray-200">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
         Set Your Weekly Availability
       </h2>
 
-      {daysOfWeek.map((day) => {
-        const slot = availability.find((a) => a.day === day) || {
-          day,
-          start: "",
-          end: "",
-        };
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {daysOfWeek.map((day) => {
+          const slot = availability.find((a) => a.day === day) || {
+            day,
+            start: "",
+            end: "",
+          };
 
-        return (
-          <div key={day} className="flex items-center gap-4">
-            <label className="w-24 font-medium">{day}</label>
+          return (
+            <div
+              key={day}
+              className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4"
+            >
+              <label className="w-28 font-medium text-gray-700">{day}</label>
 
-            <input
-              type="time"
-              value={slot.start}
-              onChange={(e) => updateDay(day, "start", e.target.value)}
-              className="border px-2 py-1 rounded"
-              required
-            />
-            <span>to</span>
-            <input
-              type="time"
-              value={slot.end}
-              onChange={(e) => updateDay(day, "end", e.target.value)}
-              className="border px-2 py-1 rounded"
-              required
-            />
-          </div>
-        );
-      })}
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <input
+                  type="time"
+                  value={slot.start}
+                  onChange={(e) => updateDay(day, "start", e.target.value)}
+                  className="border rounded px-3 py-1 text-sm w-full sm:w-auto"
+                  required
+                />
+                <span className="text-gray-600">to</span>
+                <input
+                  type="time"
+                  value={slot.end}
+                  onChange={(e) => updateDay(day, "end", e.target.value)}
+                  className="border rounded px-3 py-1 text-sm w-full sm:w-auto"
+                  required
+                />
+              </div>
+            </div>
+          );
+        })}
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded"
-      >
-        {loading ? "Saving..." : "Save Availability"}
-      </button>
+        <div className="pt-4">
+          <button
+            type="submit"
+            disabled={loading}
+            className={`bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 transition disabled:opacity-60`}
+          >
+            {loading ? "Saving..." : "Save Availability"}
+          </button>
 
-      {success && (
-        <p className="text-green-600 mt-2">Availability saved successfully!</p>
-      )}
-      {success === false && (
-        <p className="text-red-600 mt-2">Failed to save availability.</p>
-      )}
-    </form>
+          {success === true && (
+            <p className="text-green-600 mt-3">
+              Availability saved successfully!
+            </p>
+          )}
+          {success === false && (
+            <p className="text-red-600 mt-3">Failed to save availability.</p>
+          )}
+        </div>
+      </form>
+    </div>
   );
 }

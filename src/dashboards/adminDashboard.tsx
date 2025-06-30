@@ -6,7 +6,7 @@ import AdminAddUser from "../utils/admin/adminAddUser";
 
 export default function AdminDashboard() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 bg-inherit">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-inherit p-4 rounded-xl shadow-md border border-black">
           <FetchAdmin />

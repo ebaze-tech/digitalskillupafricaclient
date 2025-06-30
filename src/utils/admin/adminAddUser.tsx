@@ -22,13 +22,15 @@ export default function AddUserForm() {
     setLoading(true);
     try {
       await API.post("/admin/add-user", formData);
-      toast.success("User created successfully");
-      setFormData({ username: "", email: "", password: "", role: "mentee" });
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
+      toast.success("✅ User created successfully");
+      setFormData({
+        username: "",
+        email: "",
+        password: "",
+        role: "mentee",
+      });
     } catch (error: any) {
-      const message = error?.response?.data?.error || "Error creating user";
+      const message = error?.response?.data?.error || "❌ Error creating user";
       toast.error(message);
     } finally {
       setLoading(false);
@@ -38,55 +40,75 @@ export default function AddUserForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 p-4 bg-blue-400 shadow rounded"
+      className="max-w-md mx-auto bg-white border border-gray-300 rounded-lg shadow p-6 space-y-5"
     >
-      <h2 className="text-lg font-bold">Add New User</h2>
+      <h2 className="text-2xl font-bold text-gray-800">Add New User</h2>
 
-      <input
-        name="username"
-        value={formData.username}
-        onChange={handleChange}
-        placeholder="Username"
-        className="w-full border px-3 py-2 rounded"
-        required
-      />
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Username
+        </label>
+        <input
+          name="username"
+          value={formData.username}
+          onChange={handleChange}
+          placeholder="Enter username"
+          className="w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300"
+          required
+        />
+      </div>
 
-      <input
-        name="email"
-        type="email"
-        value={formData.email}
-        onChange={handleChange}
-        placeholder="Email"
-        className="w-full border px-3 py-2 rounded"
-        required
-      />
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Email
+        </label>
+        <input
+          name="email"
+          type="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="Enter email"
+          className="w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300"
+          required
+        />
+      </div>
 
-      <input
-        name="password"
-        type="password"
-        value={formData.password}
-        onChange={handleChange}
-        placeholder="Password"
-        className="w-full border px-3 py-2 rounded"
-        required
-      />
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Password
+        </label>
+        <input
+          name="password"
+          type="password"
+          value={formData.password}
+          onChange={handleChange}
+          placeholder="Enter password"
+          className="w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300"
+          required
+        />
+      </div>
 
-      <select
-        name="role"
-        value={formData.role}
-        onChange={handleChange}
-        className="w-full border px-3 py-2 rounded"
-        required
-      >
-        <option value="mentor">Mentor</option>
-        <option value="mentee">Mentee</option>
-        <option value="admin">Admin</option>
-      </select>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Role
+        </label>
+        <select
+          name="role"
+          value={formData.role}
+          onChange={handleChange}
+          className="w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300"
+          required
+        >
+          <option value="mentor">Mentor</option>
+          <option value="mentee">Mentee</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
 
       <button
         type="submit"
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer"
         disabled={loading}
+        className="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
       >
         {loading ? "Adding..." : "Add User"}
       </button>

@@ -9,15 +9,13 @@ interface Admin {
   email: string;
   role?: string;
 }
+
 export default function FetchAdmin() {
   const [admin, setAdmin] = useState<Admin | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const { user } = useAuth();
-  console.log(user?.roleId);
-  const roleId = user?.roleId;
-  console.log(roleId);
 
-  const adminId = roleId;
+  const adminId = user?.roleId;
 
   useEffect(() => {
     if (!adminId) return;
@@ -26,9 +24,8 @@ export default function FetchAdmin() {
       setLoading(true);
       try {
         const response = await API.get(`/admin/info/${adminId}`);
-        console.log(response.data + "Admin");
         setAdmin(response.data);
-        toast.success("Mentor data fetched successfully");
+        toast.success("Admin data fetched successfully");
       } catch (error: any) {
         console.error("Error fetching admin data", error);
         const message =
@@ -43,29 +40,27 @@ export default function FetchAdmin() {
   }, [adminId]);
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Welcome {admin?.username}</h2>
+    <div className="max-w-xl mx-auto p-6">
+      <h2 className="text-2xl font-bold mb-4 text-gray-800">
+        {admin ? `Welcome, ${admin.username}` : "Admin Dashboard"}
+      </h2>
 
       {loading ? (
-        <p>Loading admin dashboard...</p>
+        <p className="text-gray-500">Loading admin dashboard...</p>
       ) : !admin ? (
-        <p>No admin details found.</p>
+        <p className="text-red-500">No admin details found.</p>
       ) : (
-        <div className="space-y-4">
-          <div
-            key={admin?.userId}
-            className="border p-4 rounded shadow-sm flex items-center justify-between bg-blue-400"
-          >
-            <div>
-              <p className="font-semibold text-lg">{admin?.username}</p>
-              <p className="text-sm text-white">User ID: {admin?.userId}</p>
-              {admin?.role && (
-                <p className="text-sm text-blue-600 font-medium">
-                  Role: {admin?.role}
-                </p>
-              )}
-            </div>
-          </div>
+        <div className="bg-white border border-gray-300 rounded shadow p-6 space-y-2">
+          <p className="text-lg font-semibold text-gray-800">
+            {admin.username}
+          </p>
+          <p className="text-sm text-gray-600">Email: {admin.email}</p>
+          <p className="text-sm text-gray-600">User ID: {admin.userId}</p>
+          {admin.role && (
+            <p className="text-sm font-medium text-blue-600">
+              Role: {admin.role}
+            </p>
+          )}
         </div>
       )}
     </div>

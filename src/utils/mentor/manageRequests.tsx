@@ -6,9 +6,9 @@ import { useAuth } from "../../authContext";
 
 interface MentorshipRequest {
   id: number;
-  menteeName: string;
-  menteeEmail: string;
-  goals: string;
+  menteeId: string;
+  username: string;
+  email: string;
   status: "pending" | "accepted" | "rejected";
 }
 
@@ -17,27 +17,26 @@ export default function ManageRequests() {
   const [loading, setLoading] = useState(false);
   const [respondingId, setRespondingId] = useState<number | null>(null);
   const { user } = useAuth();
-  const roleId = user?.roleId;
-  console.log(roleId);
-  const mentorId = roleId;
-  console.log(mentorId);
 
   useEffect(() => {
+    if (!user?.id) return;
+
     const fetchRequests = async () => {
       setLoading(true);
       try {
-        if (!mentorId) return;
-        const response = await API.get(`/mentorship/incoming/${mentorId}`);
+        const response = await API.get(`/mentorship/incoming/${user.id}`);
         setRequests(response.data || []);
-      } catch (err) {
-        toast.error("Failed to load mentorship requests");
+      } catch (err: any) {
+        toast.error(
+          err.response?.data?.error || "Failed to load mentorship requests"
+        );
       } finally {
         setLoading(false);
       }
     };
 
     fetchRequests();
-  }, []);
+  }, [user]);
 
   const handleRespond = async (
     requestId: number,
@@ -45,64 +44,89 @@ export default function ManageRequests() {
   ) => {
     setRespondingId(requestId);
     try {
-      await API.post(`/mentorship/requests/respond/${requestId}`, { status });
+      const response = await API.post(
+        `/mentorship/requests/respond/${requestId}`,
+        { status }
+      );
       toast.success(`Request ${status}`);
       setRequests((prev) =>
-        prev.map((req) => (req.id === requestId ? { ...req, status } : req))
+        prev.map((req) => (req.id === requestId ? response.data : req))
       );
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to respond");
+      toast.error(err.response?.data?.error || "Failed to respond");
     } finally {
       setRespondingId(null);
     }
   };
 
+  if (!user) {
+    return (
+      <div className="text-center py-6">
+        <Loader2 className="animate-spin inline-block w-5 h-5 mr-2" />
+        Loading user info...
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-4xl border border-black mx-auto py-6 px-4 bg-inherit shadow rounded">
-      <h2 className="text-2xl font-bold text-black mb-4">
+    <div className="max-w-5xl mx-auto py-8 px-4">
+      <h2 className="text-3xl font-bold text-black mb-6 text-center">
         Mentorship Requests
       </h2>
 
       {loading ? (
-        <div className="flex justify-center items-center py-8">
-          <Loader2 className="w-6 h-6 animate-spin text-gray-600" />
+        <div className="flex justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
         </div>
       ) : requests.length === 0 ? (
-        <p className="text-white">No mentorship requests found.</p>
+        <p className="text-gray-500 text-center">
+          No mentorship requests found.
+        </p>
       ) : (
-        <ul className="space-y-4">
+        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2">
           {requests.map((req) => (
-            <li
+            <div
               key={req.id}
-              className="border p-4 rounded shadow-sm bg-white flex flex-col gap-2"
+              className="border rounded-lg shadow-md bg-white p-6 flex flex-col justify-between h-full"
             >
-              <div>
-                <p className="font-semibold text-lg">{req.menteeName}</p>
-                <p className="text-sm text-white">{req.menteeEmail}</p>
-                <p className="text-sm text-white italic">Goals: {req.goals}</p>
+              <div className="mb-4">
+                <p className="text-xl font-semibold text-gray-900">
+                  {req.username}
+                </p>
+                <p className="text-sm text-gray-500">{req.email}</p>
               </div>
 
-              <div className="flex items-center gap-4 mt-2">
+              <div className="flex items-center justify-between">
                 {req.status === "pending" ? (
                   <>
                     <button
                       onClick={() => handleRespond(req.id, "accepted")}
-                      className="bg-green-600 text-white cursor-pointer px-4 py-1 rounded flex items-center gap-1 hover:bg-green-700 disabled:opacity-50"
+                      className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center gap-2 disabled:opacity-60"
                       disabled={respondingId === req.id}
                     >
-                      <ThumbsUp size={16} /> Accept
+                      {respondingId === req.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <ThumbsUp size={16} />
+                      )}
+                      Accept
                     </button>
                     <button
                       onClick={() => handleRespond(req.id, "rejected")}
-                      className="bg-red-600 text-white px-4 py-1 rounded cursor-pointer flex items-center gap-1 hover:bg-red-700 disabled:opacity-50"
+                      className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center gap-2 disabled:opacity-60"
                       disabled={respondingId === req.id}
                     >
-                      <ThumbsDown size={16} /> Reject
+                      {respondingId === req.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <ThumbsDown size={16} />
+                      )}
+                      Reject
                     </button>
                   </>
                 ) : (
                   <span
-                    className={`text-sm font-medium px-3 py-1 rounded ${
+                    className={`text-sm font-semibold px-3 py-1 rounded-full ${
                       req.status === "accepted"
                         ? "bg-green-100 text-green-700"
                         : "bg-red-100 text-red-700"
@@ -112,9 +136,9 @@ export default function ManageRequests() {
                   </span>
                 )}
               </div>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
