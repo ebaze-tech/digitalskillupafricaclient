@@ -59,7 +59,6 @@ export default function FetchMentor() {
             <h3 className="text-xl font-semibold text-gray-900">
               {mentor.username}
             </h3>
-            <p className="text-sm text-gray-600">Email: {mentor.email}</p>
             <p className="text-sm text-gray-600">User ID: {mentor.userId}</p>
           </div>
 

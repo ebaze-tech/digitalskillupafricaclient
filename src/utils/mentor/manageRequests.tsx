@@ -5,7 +5,7 @@ import { Loader2, ThumbsUp, ThumbsDown } from "lucide-react";
 import { useAuth } from "../../authContext";
 
 interface MentorshipRequest {
-  id: number;
+  id: string;
   menteeId: string;
   username: string;
   email: string;
@@ -15,7 +15,7 @@ interface MentorshipRequest {
 export default function ManageRequests() {
   const [requests, setRequests] = useState<MentorshipRequest[]>([]);
   const [loading, setLoading] = useState(false);
-  const [respondingId, setRespondingId] = useState<number | null>(null);
+  const [respondingId, setRespondingId] = useState<string | null>(null);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -39,19 +39,18 @@ export default function ManageRequests() {
   }, [user]);
 
   const handleRespond = async (
-    requestId: number,
+    requestId: string,
     status: "accepted" | "rejected"
   ) => {
     setRespondingId(requestId);
     try {
-      const response = await API.post(
-        `/mentorship/requests/respond/${requestId}`,
-        { status }
-      );
+      await API.post(`/mentorship/requests/respond/${requestId}`, { status });
       toast.success(`Request ${status}`);
-      setRequests((prev) =>
-        prev.map((req) => (req.id === requestId ? response.data : req))
-      );
+      // setRequests((prev) =>
+      //   prev.map((req) => (req.id === requestId ? response.data : req))
+      // );
+      const response = await API.get(`/mentorship/incoming/${user?.id}`);
+      setRequests(response.data || []);
     } catch (err: any) {
       toast.error(err.response?.data?.error || "Failed to respond");
     } finally {
@@ -102,7 +101,7 @@ export default function ManageRequests() {
                     <button
                       onClick={() => handleRespond(req.id, "accepted")}
                       className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center gap-2 disabled:opacity-60"
-                      disabled={respondingId === req.id}
+                      disabled={respondingId === req?.id}
                     >
                       {respondingId === req.id ? (
                         <Loader2 className="w-4 h-4 animate-spin" />

@@ -9,18 +9,48 @@ export default function UpdateProfile() {
   const { user, login } = useAuth();
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
+  type FormData = {
+    username: string;
+    email: string;
+    shortBio: string;
+    goals: string;
+    skills: string[];
+    industry: string;
+    experience: string;
+    availability: string;
+  };
+
+  const [formData, setFormData] = useState<FormData>({
     username: "",
     email: "",
     shortBio: "",
     goals: "",
-    skills: "",
+    skills: [],
     industry: "",
     experience: "",
     availability: "",
   });
 
   const [loading, setLoading] = useState(false);
+
+  // Predefined skill options
+  const skillOptions = [
+    "UI/UX",
+    "Graphic Design",
+    "Web Development",
+    "Mobile Development",
+    "Backend Development",
+    "Data Science",
+    "Machine Learning",
+    "DevOps",
+    "Project Management",
+    "Product Management",
+    "Marketing",
+    "Content Creation",
+  ];
+
+  // Predefined availability options
+  const availabilityOptions = ["Weekly", "Bi-weekly", "Monthly", "As needed"];
 
   useEffect(() => {
     if (user) {
@@ -29,7 +59,7 @@ export default function UpdateProfile() {
         email: user.email || "",
         shortBio: user.shortBio || "",
         goals: user.goals || "",
-        skills: user.skills || "",
+        skills: Array.isArray(user.skills) ? user.skills : [],
         industry: user.industry || "",
         experience: user.experience || "",
         availability: user.availability || "",
@@ -38,13 +68,25 @@ export default function UpdateProfile() {
   }, [user]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    if (name === "skills") {
+      const selectedOptions = Array.from(
+        (e.target as HTMLSelectElement).selectedOptions
+      ).map((option) => option.value);
+      setFormData((prev) => ({
+        ...prev,
+        skills: selectedOptions,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -52,31 +94,28 @@ export default function UpdateProfile() {
     setLoading(true);
 
     try {
+      // Validate skills
+      if (formData.skills.length === 0) {
+        throw new Error("At least one skill is required");
+      }
+
       const payload = {
         username: formData.username,
         shortBio: formData.shortBio,
         goals: formData.goals,
-        skills: formData.skills
-          .split(",")
-          .map((skill) => skill.trim())
-          .filter((skill) => skill.length > 0),
+        skills: formData.skills,
         industry: formData.industry,
         experience: formData.experience,
-        availability: formData.availability,
+        availability: formData.availability || undefined,
       };
 
-      await API.put(`/profile/setup`, payload);
+      const response = await API.put(`/profile/setup`, payload);
 
       if (!user) throw new Error("User is not authenticated");
 
       const updatedUser = {
         ...user,
-        ...payload,
-        email: user.email,
-        id: user.id,
-        role: user.role,
-        mentorId: user.mentorId,
-        roleId: user.roleId,
+        ...response.data.user, // Use returned user data
       };
 
       localStorage.setItem("user", JSON.stringify(updatedUser));
@@ -93,7 +132,10 @@ export default function UpdateProfile() {
 
       navigate(redirectPath);
     } catch (error: any) {
-      const msg = error?.response?.data?.message || "Failed to update profile";
+      const msg =
+        error?.response?.data?.message ||
+        error.message ||
+        "Failed to update profile";
       toast.error(msg);
     } finally {
       setLoading(false);
@@ -169,16 +211,27 @@ export default function UpdateProfile() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Skills
+                Skills (Select all that apply)
               </label>
-              <input
+              <select
                 name="skills"
+                multiple
                 value={formData.skills}
                 onChange={handleChange}
                 required
-                placeholder="e.g. JavaScript, React, Node.js"
-                className="w-full border px-4 py-2 rounded focus:ring-indigo-500 focus:outline-none"
-              />
+                className="w-full border px-4 py-2 rounded focus:ring-indigo-500 focus:outline-none h-32"
+              >
+                {skillOptions.map((skill) => (
+                  <option key={skill} value={skill}>
+                    {skill}
+                  </option>
+                ))}
+              </select>
+              {formData.skills.length > 0 && (
+                <div className="mt-2 text-sm text-gray-600">
+                  Selected skills: {formData.skills.join(", ")}
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -212,13 +265,20 @@ export default function UpdateProfile() {
                 <label className="block text-sm font-medium text-gray-700">
                   Availability
                 </label>
-                <input
+                <select
                   name="availability"
                   value={formData.availability}
                   onChange={handleChange}
-                  required
+                  required={user?.role === "mentor"}
                   className="w-full border px-4 py-2 rounded focus:ring-indigo-500 focus:outline-none"
-                />
+                >
+                  <option value="">Select availability</option>
+                  {availabilityOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           </div>
