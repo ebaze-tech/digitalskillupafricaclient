@@ -54,7 +54,6 @@ export default function FetchMentee() {
           <p className="text-lg font-semibold text-gray-800">
             {mentee.username}
           </p>
-          <p className="text-sm text-gray-600">Email: {mentee.email}</p>
           <p className="text-sm text-gray-600">User ID: {mentee.userId}</p>
           {mentee.role && (
             <p className="text-sm font-medium text-blue-600">

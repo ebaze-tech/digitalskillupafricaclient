@@ -3,6 +3,7 @@ import { useAuth } from "../authContext";
 import { useNavigate } from "react-router-dom";
 import API from "../axios/axios";
 import { Loader2 } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function LoginPage() {
   const [email, setEmail] = useState<string>("");
@@ -22,23 +23,26 @@ export default function LoginPage() {
       const response = await API.post("/auth/login", { email, password });
       const { user, token } = response.data;
 
-      // Save token and user
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-      console.log(user.role);
       login(user);
+      console.log(user);
 
-      console.log(user.shortBio);
-
-      // Navigate to appropriate dashboard
       const needsProfileUpdate =
         (user.role === "mentor" || user.role === "mentee") &&
-        (!user.skills ||
-          (Array.isArray(user.skills) && user.skills.length === 0));
+        (!user.username ||
+          !user.shortBio ||
+          !user.goals ||
+          !user.skills ||
+          user.skills.length === 0 ||
+          (user.role === "mentor" &&
+            (!user.industry || !user.experience || !user.availability)));
 
       if (needsProfileUpdate) {
+        toast.info("Please complete your profile to continue.");
         return navigate("/update-profile");
       }
+
       switch (user.role) {
         case "admin":
           navigate("/dashboard/admin");
@@ -54,7 +58,9 @@ export default function LoginPage() {
           break;
       }
     } catch (error: any) {
-      setError(error.response?.data?.message || "Login failed");
+      const errorMessage = error.response?.data?.message || "Login failed";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
