@@ -18,6 +18,8 @@ import "react-toastify/dist/ReactToastify.css";
 import MentorAvailabilityForm from "./utils/mentor/mentorAvailabilityForm";
 import ManageRequests from "./utils/mentor/manageRequests";
 import ViewMentors from "./utils/mentee/viewMentors";
+import ForgotPasswordPage from "./auth/forgotPassword";
+import ResetPasswordPage from "./auth/resetPassword";
 // import SessionBookingForm from "./utils/sessionBookingForm";
 
 function AppRoutes() {
@@ -28,6 +30,8 @@ function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/update-profile" element={<UpdateProfile />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
       {/* <Route path="/dashboard" element={<div>Loading...</div>} /> */}
 
