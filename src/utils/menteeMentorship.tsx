@@ -55,7 +55,7 @@ const MenteeMentorship: React.FC = () => {
           </p>
           <button
             onClick={() => requestMentorship(mentor.id)}
-            className="mt-2 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 w-fit"
+            className="mt-2 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 w-fit cursor-pointer"
             disabled={loading}
           >
             {loading ? "Sending..." : "Request Mentorship"}

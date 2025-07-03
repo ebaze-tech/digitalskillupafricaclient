@@ -44,7 +44,7 @@ export default function EditUserForm() {
     try {
       await API.put(`/admin/edit-user/${id}`, formData);
       toast.success("User updated successfully");
-      navigate("/dashboard/users");
+      navigate("/dashboard/admin/users");
     } catch (error: any) {
       const message = error?.response?.data?.error || "Error updating user";
       toast.error(message);
@@ -55,13 +55,17 @@ export default function EditUserForm() {
 
   if (!id) {
     return (
-      <p className="text-red-500 font-semibold">Invalid or missing user ID.</p>
+      <p className="text-red-500 font-semibold text-center px-4 mt-6">
+        Invalid or missing user ID.
+      </p>
     );
   }
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-6 bg-white rounded-lg shadow-md border border-gray-200">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Edit User</h2>
+    <div className="max-w-xl mx-auto px-4 sm:px-6 py-8 bg-white rounded-lg shadow-md border border-gray-200">
+      <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-800 text-center sm:text-left">
+        Edit User
+      </h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
@@ -126,7 +130,7 @@ export default function EditUserForm() {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full text-white px-4 py-2 rounded ${
+          className={`w-full text-white px-4 py-2 rounded text-sm sm:text-base cursor-pointer ${
             loading
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-green-600 hover:bg-green-700"

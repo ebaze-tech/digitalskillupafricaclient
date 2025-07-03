@@ -9,18 +9,7 @@ export default function UpdateProfile() {
   const { user, login } = useAuth();
   const navigate = useNavigate();
 
-  type FormData = {
-    username: string;
-    email: string;
-    shortBio: string;
-    goals: string;
-    skills: string[];
-    industry: string;
-    experience: string;
-    availability: string;
-  };
-
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState({
     username: "",
     email: "",
     shortBio: "",
@@ -33,7 +22,6 @@ export default function UpdateProfile() {
 
   const [loading, setLoading] = useState(false);
 
-  // Predefined skill options
   const skillOptions = [
     "UI/UX",
     "Graphic Design",
@@ -49,8 +37,33 @@ export default function UpdateProfile() {
     "Content Creation",
   ];
 
-  // Predefined availability options
   const availabilityOptions = ["Weekly", "Bi-weekly", "Monthly", "As needed"];
+
+  const role = user?.role ?? "mentee";
+
+  const textColorMap: Record<string, string> = {
+    admin: "text-yellow-700",
+    mentor: "text-green-700",
+    mentee: "text-purple-700",
+  };
+
+  const focusRingMap: Record<string, string> = {
+    admin: "focus:ring-yellow-400",
+    mentor: "focus:ring-green-400",
+    mentee: "focus:ring-purple-400",
+  };
+
+  const bgGradientMap: Record<string, string> = {
+    admin: "from-yellow-100 via-yellow-200 to-yellow-300",
+    mentor: "from-green-100 via-green-200 to-green-300",
+    mentee: "from-purple-100 via-purple-200 to-purple-300",
+  };
+
+  const buttonColorMap: Record<string, string> = {
+    admin: "bg-yellow-600 hover:bg-yellow-700",
+    mentor: "bg-green-600 hover:bg-green-700",
+    mentee: "bg-purple-600 hover:bg-purple-700",
+  };
 
   useEffect(() => {
     if (user) {
@@ -73,19 +86,14 @@ export default function UpdateProfile() {
     >
   ) => {
     const { name, value } = e.target;
+
     if (name === "skills") {
-      const selectedOptions = Array.from(
+      const selected = Array.from(
         (e.target as HTMLSelectElement).selectedOptions
-      ).map((option) => option.value);
-      setFormData((prev) => ({
-        ...prev,
-        skills: selectedOptions,
-      }));
+      ).map((o) => o.value);
+      setFormData((prev) => ({ ...prev, skills: selected }));
     } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -94,9 +102,8 @@ export default function UpdateProfile() {
     setLoading(true);
 
     try {
-      // Validate skills
       if (formData.skills.length === 0) {
-        throw new Error("At least one skill is required");
+        throw new Error("At least one skill must be selected.");
       }
 
       const payload = {
@@ -109,117 +116,106 @@ export default function UpdateProfile() {
         availability: formData.availability || undefined,
       };
 
-      const response = await API.put(`/profile/setup`, payload);
+      const res = await API.put(`/profile/setup`, payload);
 
-      if (!user) throw new Error("User is not authenticated");
-
-      const updatedUser = {
-        ...user,
-        ...response.data.user, // Use returned user data
-      };
-
+      const updatedUser = { ...user, ...res.data.user };
       localStorage.setItem("user", JSON.stringify(updatedUser));
       login(updatedUser);
 
-      toast.success("✅ Profile updated successfully");
+      toast.success("Profile updated successfully");
 
-      const redirectPath =
-        user?.role === "mentor"
+      navigate(
+        role === "mentor"
           ? "/dashboard/mentor"
-          : user?.role === "mentee"
+          : role === "mentee"
           ? "/dashboard/mentee"
-          : "/dashboard/admin";
-
-      navigate(redirectPath);
+          : "/dashboard/admin"
+      );
     } catch (error: any) {
-      const msg =
+      toast.error(
         error?.response?.data?.message ||
-        error.message ||
-        "Failed to update profile";
-      toast.error(msg);
+          error.message ||
+          "Failed to update profile"
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-white to-purple-100 flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-2xl bg-white p-8 rounded-xl shadow-lg">
-        <h2 className="text-3xl font-extrabold text-center text-indigo-700 mb-8">
+    <div
+      className={`min-h-screen flex items-center justify-center px-4 py-10 bg-gradient-to-br ${bgGradientMap[role]}`}
+    >
+      <div className="w-full max-w-4xl bg-white p-8 md:p-10 rounded-2xl shadow-xl border border-gray-200">
+        <h2
+          className={`text-3xl font-bold text-center ${textColorMap[role]} mb-6`}
+        >
           Complete Your Profile
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Read-only Fields */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Read-only fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-600">
+              <label className="text-sm font-medium text-gray-700">
                 Username
               </label>
               <input
                 name="username"
                 value={formData.username}
                 readOnly
-                className="w-full bg-gray-100 text-gray-500 border px-4 py-2 rounded cursor-not-allowed"
+                className="w-full bg-gray-100 text-gray-500 border px-4 py-2 rounded-md"
               />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-600">
-                Email
-              </label>
+              <label className="text-sm font-medium text-gray-700">Email</label>
               <input
                 name="email"
                 value={formData.email}
                 readOnly
-                className="w-full bg-gray-100 text-gray-500 border px-4 py-2 rounded cursor-not-allowed"
+                className="w-full bg-gray-100 text-gray-500 border px-4 py-2 rounded-md"
               />
             </div>
           </div>
 
-          {/* Editable Fields */}
+          {/* Editable fields */}
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="text-sm font-medium text-gray-700">
                 Short Bio
               </label>
               <textarea
                 name="shortBio"
                 value={formData.shortBio}
                 onChange={handleChange}
-                required
                 rows={3}
-                className="w-full border px-4 py-2 rounded focus:ring-indigo-500 focus:outline-none"
-                placeholder="Tell us a bit about yourself..."
+                className={`w-full border px-4 py-2 rounded-md focus:outline-none ${focusRingMap[role]}`}
+                required
               />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Goals
-              </label>
+              <label className="text-sm font-medium text-gray-700">Goals</label>
               <textarea
                 name="goals"
                 value={formData.goals}
                 onChange={handleChange}
-                required
                 rows={3}
-                className="w-full border px-4 py-2 rounded focus:ring-indigo-500 focus:outline-none"
-                placeholder="What are your mentorship goals?"
+                className={`w-full border px-4 py-2 rounded-md focus:outline-none ${focusRingMap[role]}`}
+                required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Skills (Select all that apply)
+              <label className="text-sm font-medium text-gray-700">
+                Skills (select all that apply)
               </label>
               <select
                 name="skills"
                 multiple
                 value={formData.skills}
                 onChange={handleChange}
+                className={`w-full border px-4 py-2 rounded-md h-36 focus:outline-none ${focusRingMap[role]}`}
                 required
-                className="w-full border px-4 py-2 rounded focus:ring-indigo-500 focus:outline-none h-32"
               >
                 {skillOptions.map((skill) => (
                   <option key={skill} value={skill}>
@@ -228,41 +224,39 @@ export default function UpdateProfile() {
                 ))}
               </select>
               {formData.skills.length > 0 && (
-                <div className="mt-2 text-sm text-gray-600">
-                  Selected skills: {formData.skills.join(", ")}
+                <div className="text-sm mt-2 text-gray-600">
+                  Selected: {formData.skills.join(", ")}
                 </div>
               )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="text-sm font-medium text-gray-700">
                   Industry
                 </label>
                 <input
                   name="industry"
                   value={formData.industry}
                   onChange={handleChange}
+                  className={`w-full border px-4 py-2 rounded-md focus:outline-none ${focusRingMap[role]}`}
                   required
-                  className="w-full border px-4 py-2 rounded focus:ring-indigo-500 focus:outline-none"
                 />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="text-sm font-medium text-gray-700">
                   Experience
                 </label>
                 <input
                   name="experience"
                   value={formData.experience}
                   onChange={handleChange}
+                  className={`w-full border px-4 py-2 rounded-md focus:outline-none ${focusRingMap[role]}`}
                   required
-                  className="w-full border px-4 py-2 rounded focus:ring-indigo-500 focus:outline-none"
                 />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="text-sm font-medium text-gray-700">
                   Availability
                 </label>
                 <select
@@ -270,12 +264,12 @@ export default function UpdateProfile() {
                   value={formData.availability}
                   onChange={handleChange}
                   required={user?.role === "mentor"}
-                  className="w-full border px-4 py-2 rounded focus:ring-indigo-500 focus:outline-none"
+                  className={`w-full border px-4 py-2 rounded-md focus:outline-none ${focusRingMap[role]}`}
                 >
-                  <option value="">Select availability</option>
-                  {availabilityOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
+                  <option value="">Select</option>
+                  {availabilityOptions.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
                     </option>
                   ))}
                 </select>
@@ -286,7 +280,7 @@ export default function UpdateProfile() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition flex justify-center items-center gap-2"
+            className={`w-full flex justify-center items-center gap-2 ${buttonColorMap[role]} text-white font-semibold py-3 rounded-md transition`}
           >
             {loading ? (
               <>

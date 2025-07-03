@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import API from "../../axios/axios";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { Loader2, User2, Mail, ShieldCheck } from "lucide-react";
 
 interface AdminUsers {
   userId: string;
@@ -35,41 +35,49 @@ export default function AdminFetchUsers() {
   }, []);
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
         All Registered Users
       </h2>
 
       {loading ? (
-        <div className="flex justify-center items-center py-10 text-gray-500">
-          <Loader2 className="animate-spin w-6 h-6 mr-2" />
-          Loading admin dashboard...
+        <div className="flex justify-center items-center py-10 text-gray-500 gap-2">
+          <Loader2 className="animate-spin w-6 h-6" />
+          <span>Loading users...</span>
         </div>
       ) : users.length === 0 ? (
-        <p className="text-gray-500">No users found.</p>
+        <p className="text-gray-500 text-center">No users found.</p>
       ) : (
-        <div className="space-y-4">
+        <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {users.map((user) => (
             <div
               key={user.id}
-              className="border border-gray-300 bg-white rounded-lg shadow-md p-4 flex flex-col md:flex-row justify-between items-start md:items-center"
+              className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition"
             >
-              <div className="space-y-1">
-                <p className="text-lg font-semibold text-gray-800">
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                  <User2 className="w-5 h-5 text-indigo-600" />
                   {user.username}
-                </p>
-                <p className="text-sm text-gray-600">Email: {user.email}</p>
-                <p className="text-sm text-gray-600">User ID: {user.id}</p>
-                {user.role && (
-                  <p className="text-sm text-blue-600 font-medium">
-                    Role: {user.role}
-                  </p>
-                )}
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-700">
+                  <Mail className="w-4 h-4 text-gray-500" />
+                  {user.email}
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="font-medium">ID:</span> {user.id}
+                </div>
+                <div className="flex items-center gap-2 text-sm text-blue-600">
+                  <ShieldCheck className="w-4 h-4 text-blue-500" />
+                  Role:{" "}
+                  <span className="capitalize font-medium ml-1">
+                    {user.role || "Unassigned"}
+                  </span>
+                </div>
               </div>
 
-              <Link to={`/admin/edit/${user.id}`} className="mt-4 md:mt-0">
-                <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-all duration-200">
-                  Edit
+              <Link to={`/dashboard/admin/edit/${user.id}`}>
+                <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition cursor-pointer">
+                  Edit User
                 </button>
               </Link>
             </div>
