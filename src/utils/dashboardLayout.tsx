@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "../authContext";
 import { useNavigate } from "react-router-dom";
 import {
@@ -8,14 +8,21 @@ import {
   Home,
   UserPlus2,
   Clock,
-  Search,
+  Menu,
+  X,
+  UsersRoundIcon,
+  EyeIcon,
+  FileEditIcon,
 } from "lucide-react";
 
-const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+interface Props {
+  children: React.ReactNode;
+}
+
+export default function DashboardLayout({ children }: Props) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -24,89 +31,82 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
     navigate("/login");
   };
 
+  const handleEditProfile = () => navigate("/profile/edit");
+
+  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
+
   const renderLinks = () => {
     switch (user?.role) {
       case "admin":
         return (
           <>
-            <li>
-              <a href="/dashboard/admin" className="dashboard-link">
-                <Home size={18} />
-                Home
-              </a>
-            </li>
-            <li>
-              <a href="/dashboard/admin/users" className="dashboard-link">
-                <User size={18} />
-                Manage Users
-              </a>
-            </li>
-            <li>
-              <a
-                href="/dashboard/admin/assign-mentor"
-                className="dashboard-link"
-              >
-                <UserPlus2 size={18} />
-                Assign Mentor
-              </a>
-            </li>
-            <li>
-              <a href="/dashboard/admin/sessions" className="dashboard-link">
-                <Calendar size={18} />
-                View Sessions
-              </a>
-            </li>
+            <DashboardLink
+              href="/dashboard/admin"
+              icon={<Home size={18} />}
+              label="Home"
+            />
+            <DashboardLink
+              href="/dashboard/admin/users"
+              icon={<User size={18} />}
+              label="Manage Users"
+            />
+            <DashboardLink
+              href="/dashboard/admin/assign-mentor"
+              icon={<UserPlus2 size={18} />}
+              label="Assign Mentor"
+            />
+            <DashboardLink
+              href="/dashboard/admin/sessions"
+              icon={<Calendar size={18} />}
+              label="View Sessions"
+            />
+            <DashboardLink
+              href="/dashboard/admin/mentorship-match"
+              icon={<EyeIcon size={18} />}
+              label="Mentorship Match"
+            />
           </>
         );
-
       case "mentor":
         return (
           <>
-            <li>
-              <a href="/dashboard/mentor" className="dashboard-link">
-                <Home size={18} />
-                Dashboard
-              </a>
-            </li>
-            <li>
-              <a
-                href="/dashboard/mentor/availability"
-                className="dashboard-link"
-              >
-                <Clock size={18} />
-                Set Availability
-              </a>
-            </li>
-            <li>
-              <a href="/dashboard/mentor/sessions" className="dashboard-link">
-                <Calendar size={18} />
-                My Sessions
-              </a>
-            </li>
+            <DashboardLink
+              href="/dashboard/mentor"
+              icon={<Home size={18} />}
+              label="Dashboard"
+            />
+            <DashboardLink
+              href="/dashboard/mentor/availability"
+              icon={<Clock size={18} />}
+              label="Set Availability"
+            />
+            <DashboardLink
+              href="/dashboard/mentor/sessions"
+              icon={<Calendar size={18} />}
+              label="My Sessions"
+            />
+            <DashboardLink
+              href="/dashboard/mentor/assigned-mentees"
+              icon={<UsersRoundIcon size={18} />}
+              label="My Mentees"
+            />
           </>
         );
-
       case "mentee":
         return (
           <>
-            <li>
-              <a href="/dashboard/mentee" className="dashboard-link">
-                <Home size={18} />
-                Dashboard
-              </a>
-            </li>
-            <li>
-              <a
-                href="/dashboard/mentee/view-mentors"
-                className="dashboard-link"
-              >
-                <Search size={18} />
-                Browse Mentors
-              </a>
-            </li>
+            <DashboardLink
+              href="/dashboard/mentee"
+              icon={<Home size={18} />}
+              label="Dashboard"
+            />
+            <DashboardLink
+              href="/dashboard/mentee/view-mentors"
+              icon={<UserPlus2 size={18} />}
+              label="Connect Mentor"
+            />
           </>
         );
-
       default:
         return null;
     }
@@ -128,32 +128,76 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
   const sidebarBg = sidebarBgMap[user?.role ?? "mentee"];
 
   return (
-    <div className={`flex min-h-screen bg-gradient-to-br ${mainBg}`}>
+    <div
+      className={`flex flex-col md:flex-row min-h-screen bg-gradient-to-br ${mainBg} overflow-hidden`}
+    >
+      {/* Mobile Navbar */}
+      <div className="flex justify-between items-center p-4 md:hidden bg-white shadow-md">
+        <h2 className="text-lg font-bold text-black">
+          Hello, {user?.username}
+        </h2>
+        <button onClick={toggleSidebar} className="text-gray-700">
+          {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
+
       {/* Sidebar */}
       <aside
-        className={`w-64 bg-gradient-to-tr ${sidebarBg} text-white p-6 shadow-xl border border-r-2 border-black`}
+        className={`fixed md:static top-0 left-0 h-full w-64 z-40 transform ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 transition-transform duration-300 ease-in-out bg-gradient-to-tr ${sidebarBg} text-black p-6 shadow-xl border-r border-black`}
       >
-        <h2 className="text-xl font-bold mb-10 tracking-wide text-black">
+        <h2 className="text-xl font-bold mb-10 tracking-wide hidden md:block">
           Hello, {user?.username}
         </h2>
 
         <ul className="space-y-3 text-sm font-medium">{renderLinks()}</ul>
 
-        <button
-          onClick={handleLogout}
-          className="mt-10 flex items-center gap-2 bg-red-500 px-3 py-2 rounded hover:bg-red-600 transition text-black w-full text-left cursor-pointer"
-        >
-          <LogOut size={18} />
-          Logout
-        </button>
+        <div className="mt-10 space-y-4">
+          <button
+            onClick={handleEditProfile}
+            className="flex items-center gap-2 px-3 py-2 rounded border-2 border-black bg-inherit text-black w-full hover:bg-gray-100 transition"
+          >
+            <FileEditIcon size={18} />
+            Edit Profile
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-3 py-2 rounded bg-red-500 text-black w-full hover:bg-red-600 transition"
+          >
+            <LogOut size={18} />
+            Logout
+          </button>
+        </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8 overflow-y-auto">
+      <main className="flex-1 p-4 md:p-8 mt-16 md:mt-0 overflow-y-auto">
         <div className="max-w-7xl mx-auto">{children}</div>
       </main>
     </div>
   );
-};
+}
 
-export default DashboardLayout;
+function DashboardLink({
+  href,
+  icon,
+  label,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <li>
+      <a
+        href={href}
+        className="flex items-center gap-2 px-3 py-2 rounded border-2 border-black hover:bg-white/10 transition"
+      >
+        {icon}
+        {label}
+      </a>
+    </li>
+  );
+}

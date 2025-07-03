@@ -44,7 +44,7 @@ export default function RegisterPage() {
   }) => (
     <button
       onClick={onClick}
-      className="text-gray-700 hover:text-indigo-600 px-4 py-2 font-medium"
+      className="text-gray-700 hover:text-indigo-600 px-4 py-2 font-medium cursor-pointer"
     >
       {label}
     </button>
@@ -56,10 +56,10 @@ export default function RegisterPage() {
       <nav className="bg-white/90 backdrop-blur-md border-b border-gray-200 px-6 py-4 shadow-sm sticky top-0 z-50">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div
-            className="text-2xl font-bold text-indigo-600 cursor-pointer"
+            className="text-2xl font-extrabold text-indigo-700 cursor-pointer"
             onClick={() => navigate("/")}
           >
-            MentorLink
+            Mentor<span className="text-green-600">Link</span>
           </div>
 
           {/* Desktop menu */}
@@ -70,7 +70,7 @@ export default function RegisterPage() {
 
           {/* Mobile toggle */}
           <div className="md:hidden">
-            <button onClick={() => setMenuOpen(!menuOpen)}>
+            <button onClick={() => setMenuOpen(!menuOpen)} className="cursor-pointer">
               {menuOpen ? (
                 <X className="w-6 h-6" />
               ) : (
@@ -169,7 +169,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition"
+              className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition cursor-pointer"
             >
               {loading ? (
                 <>

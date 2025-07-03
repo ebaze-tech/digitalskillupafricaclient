@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import API from "../../axios/axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../../authContext";
-import { Loader2 } from "lucide-react";
+import { Loader2, User2, Mail, Fingerprint, ShieldCheck } from "lucide-react";
 
 interface Mentor {
   userId: string;
@@ -39,36 +39,49 @@ export default function FetchMentor() {
   }, [mentorId]);
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <h2 className="text-3xl font-bold text-black mb-6 text-center">
+    <div className="max-w-5xl mx-auto px-4 py-8">
+      <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 text-center mb-6">
         {mentor ? `Welcome, ${mentor.username}` : "Mentor Dashboard"}
       </h2>
 
       {loading ? (
-        <div className="flex justify-center items-center py-10">
-          <Loader2 className="w-6 h-6 animate-spin text-gray-600" />
-          <span className="ml-2 text-gray-500">
-            Loading mentor dashboard...
-          </span>
+        <div className="flex justify-center items-center gap-2 py-10 text-gray-600">
+          <Loader2 className="w-6 h-6 animate-spin" />
+          <span>Loading mentor dashboard...</span>
         </div>
       ) : !mentor ? (
-        <p className="text-red-600 text-center">Mentor details not found.</p>
+        <p className="text-red-600 text-center font-medium">
+          Mentor details not found.
+        </p>
       ) : (
-        <div className="bg-white border border-gray-200 shadow-md rounded-lg p-6 space-y-4">
-          <div>
-            <h3 className="text-xl font-semibold text-gray-900">
-              {mentor.username}
-            </h3>
-            <p className="text-sm text-gray-600">User ID: {mentor.userId}</p>
-          </div>
-
-          {mentor.role && (
-            <div className="mt-2">
-              <span className="text-sm font-medium text-blue-700 bg-blue-100 px-2 py-1 rounded-full">
-                Role: {mentor.role.toUpperCase()}
-              </span>
+        <div className="bg-white border border-gray-200 shadow-lg rounded-xl p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Left Info */}
+            <div className="space-y-4">
+              <p className="flex items-center gap-2 text-lg font-semibold text-gray-800 break-words">
+                <User2 className="w-5 h-5 text-indigo-600" />
+                <span className="truncate">{mentor.username}</span>
+              </p>
+              <p className="flex items-center gap-2 text-sm text-gray-600 break-words">
+                <Mail className="w-4 h-4 text-gray-500" />
+                <span className="truncate">{mentor.email}</span>
+              </p>
+              <p className="flex items-center gap-2 text-sm text-gray-600 break-words">
+                <Fingerprint className="w-4 h-4 text-gray-500" />
+                <span className="truncate">ID: {mentor.userId}</span>
+              </p>
             </div>
-          )}
+
+            {/* Right Badge */}
+            {mentor.role && (
+              <div className="flex md:justify-end justify-center items-center">
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-blue-700 bg-blue-100 px-4 py-2 rounded-full">
+                  <ShieldCheck className="w-4 h-4 text-blue-700" />
+                  {mentor.role.toUpperCase()}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

@@ -20,6 +20,10 @@ import ManageRequests from "./utils/mentor/manageRequests";
 import ViewMentors from "./utils/mentee/viewMentors";
 import ForgotPasswordPage from "./auth/forgotPassword";
 import ResetPasswordPage from "./auth/resetPassword";
+import AssignedMentees from "./utils/mentor/assignedMentee";
+import AdminMentorshipMatches from "./utils/admin/viewAllMentorshipMatch";
+import MentorUpcomingSessions from "./utils/mentor/upcomingSessions";
+import MenteeUpcomingSessions from "./utils/mentee/upcomingSession";
 // import SessionBookingForm from "./utils/sessionBookingForm";
 
 function AppRoutes() {
@@ -29,12 +33,10 @@ function AppRoutes() {
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/update-profile" element={<UpdateProfile />} />
+      <Route path="/profile/edit" element={<UpdateProfile />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-
       {/* <Route path="/dashboard" element={<div>Loading...</div>} /> */}
-
       <Route
         path="/dashboard/admin"
         element={
@@ -56,6 +58,14 @@ function AppRoutes() {
         element={
           <DashboardLayout>
             <AdminAssignMentor />
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/dashboard/admin/mentorship-match"
+        element={
+          <DashboardLayout>
+            <AdminMentorshipMatches />
           </DashboardLayout>
         }
       />
@@ -84,22 +94,6 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/dashboard/mentee"
-        element={
-          <DashboardLayout>
-            <MenteeDashboard />
-          </DashboardLayout>
-        }
-      />
-      <Route
-        path="/dashboard/mentee/view-mentors"
-        element={
-          <DashboardLayout>
-            <ViewMentors />
-          </DashboardLayout>
-        }
-      />
-      <Route
         path="/dashboard/mentor/availability"
         element={
           <DashboardLayout>
@@ -115,12 +109,52 @@ function AppRoutes() {
           </DashboardLayout>
         }
       />
+      <Route
+        path="/dashboard/mentor/sessions"
+        element={
+          <DashboardLayout>
+            <MentorUpcomingSessions />
+          </DashboardLayout>
+        }
+      />
       {/* Mentee */}
       <Route
         path="/dashboard/mentee"
         element={
           <DashboardLayout>
             <MenteeDashboard />
+          </DashboardLayout>
+        }
+      />{" "}
+      <Route
+        path="/dashboard/mentee/view-mentors"
+        element={
+          <DashboardLayout>
+            <ViewMentors />
+          </DashboardLayout>
+        }
+      />{" "}
+      <Route
+        path="/dashboard/mentee"
+        element={
+          <DashboardLayout>
+            <MenteeDashboard />
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/dashboard/mentor/assigned-mentees"
+        element={
+          <DashboardLayout>
+            <AssignedMentees />
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/dashboard/mentee/sessions"
+        element={
+          <DashboardLayout>
+            <MenteeUpcomingSessions />
           </DashboardLayout>
         }
       />

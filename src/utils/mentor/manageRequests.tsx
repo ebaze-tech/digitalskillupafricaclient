@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import API from "../../axios/axios";
 import { toast } from "react-toastify";
-import { Loader2, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Loader2, ThumbsUp, ThumbsDown, Mail, User } from "lucide-react";
 import { useAuth } from "../../authContext";
 
 interface MentorshipRequest {
@@ -46,9 +46,6 @@ export default function ManageRequests() {
     try {
       await API.post(`/mentorship/requests/respond/${requestId}`, { status });
       toast.success(`Request ${status}`);
-      // setRequests((prev) =>
-      //   prev.map((req) => (req.id === requestId ? response.data : req))
-      // );
       const response = await API.get(`/mentorship/incoming/${user?.id}`);
       setRequests(response.data || []);
     } catch (err: any) {
@@ -68,9 +65,9 @@ export default function ManageRequests() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto py-8 px-4">
-      <h2 className="text-3xl font-bold text-black mb-6 text-center">
-        Mentorship Requests
+    <div className="max-w-6xl mx-auto py-10 px-4">
+      <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
+        Incoming Mentorship Requests
       </h2>
 
       {loading ? (
@@ -78,61 +75,70 @@ export default function ManageRequests() {
           <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
         </div>
       ) : requests.length === 0 ? (
-        <p className="text-gray-500 text-center">
-          No mentorship requests found.
+        <p className="text-gray-600 text-center">
+          You have no mentorship requests at this time.
         </p>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2">
+        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {requests.map((req) => (
             <div
               key={req.id}
-              className="border rounded-lg shadow-md bg-white p-6 flex flex-col justify-between h-full"
+              className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col justify-between hover:shadow-md transition"
             >
-              <div className="mb-4">
-                <p className="text-xl font-semibold text-gray-900">
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                  <User className="w-5 h-5 text-indigo-500" />
                   {req.username}
-                </p>
-                <p className="text-sm text-gray-500">{req.email}</p>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600 break-words">
+                  <Mail className="w-4 h-4 text-gray-500" />
+                  {req.email}
+                </div>
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="mt-auto">
                 {req.status === "pending" ? (
-                  <>
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <button
                       onClick={() => handleRespond(req.id, "accepted")}
-                      className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center gap-2 disabled:opacity-60"
-                      disabled={respondingId === req?.id}
-                    >
-                      {respondingId === req.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <ThumbsUp size={16} />
-                      )}
-                      Accept
-                    </button>
-                    <button
-                      onClick={() => handleRespond(req.id, "rejected")}
-                      className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center gap-2 disabled:opacity-60"
+                      className="flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 text-sm disabled:opacity-60 transition"
                       disabled={respondingId === req.id}
                     >
                       {respondingId === req.id ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
-                        <ThumbsDown size={16} />
+                        <>
+                          <ThumbsUp size={16} />
+                          Accept
+                        </>
                       )}
-                      Reject
                     </button>
-                  </>
+
+                    <button
+                      onClick={() => handleRespond(req.id, "rejected")}
+                      className="flex items-center justify-center gap-2 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 text-sm disabled:opacity-60 transition"
+                      disabled={respondingId === req.id}
+                    >
+                      {respondingId === req.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <>
+                          <ThumbsDown size={16} />
+                          Reject
+                        </>
+                      )}
+                    </button>
+                  </div>
                 ) : (
-                  <span
-                    className={`text-sm font-semibold px-3 py-1 rounded-full ${
+                  <div
+                    className={`text-sm font-semibold px-3 py-1 rounded-full w-fit mt-2 ${
                       req.status === "accepted"
                         ? "bg-green-100 text-green-700"
                         : "bg-red-100 text-red-700"
                     }`}
                   >
                     {req.status.toUpperCase()}
-                  </span>
+                  </div>
                 )}
               </div>
             </div>
