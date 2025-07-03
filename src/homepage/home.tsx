@@ -72,7 +72,10 @@ const HomePage: React.FC = () => {
           </div>
 
           <div className="md:hidden cursor-pointer">
-            <button onClick={() => setMenuOpen(!menuOpen)} className="cursor-pointer">
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="cursor-pointer"
+            >
               {menuOpen ? (
                 <X className="w-6 h-6" />
               ) : (
@@ -96,8 +99,15 @@ const HomePage: React.FC = () => {
                 <NavLink
                   label="Dashboard"
                   onClick={() => {
-                    navigate("/dashboard");
-                    setMenuOpen(false);
+                    if (user.role === "admin") {
+                      navigate("/dashboard/admin");
+                    } else if (user.role === "mentor") {
+                      navigate("/dashboard/mentor");
+                    } else if (user.role === "mentee") {
+                      navigate("/dashboard/mentee");
+                    } else {
+                      logout();
+                    }
                   }}
                 />
                 <NavLink
