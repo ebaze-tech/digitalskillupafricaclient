@@ -33,7 +33,14 @@ function AppRoutes() {
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/profile/edit" element={<UpdateProfile />} />
+      <Route
+        path="/profile/edit"
+        element={
+          <DashboardLayout>
+            <UpdateProfile />
+          </DashboardLayout>
+        }
+      />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
       {/* <Route path="/dashboard" element={<div>Loading...</div>} /> */}
