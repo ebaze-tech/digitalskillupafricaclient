@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import API from "../../axios/axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../../authContext";
-import { Loader2, User2, Mail, ShieldCheck, Link2 } from "lucide-react";
+import { Loader2, User2, Mail, Link2 } from "lucide-react";
 
 interface User {
   id: string;

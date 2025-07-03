@@ -34,7 +34,10 @@ export default function MentorAvailabilityForm() {
             start: slot.start_time,
             end: slot.end_time,
           }))
-          .sort((a, b) => allDays.indexOf(a.day) - allDays.indexOf(b.day));
+          .sort(
+            (a: { day: string }, b: { day: string }) =>
+              allDays.indexOf(a.day) - allDays.indexOf(b.day)
+          );
         setAvailability(transformed);
       } catch (error: any) {
         const message =

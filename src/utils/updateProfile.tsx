@@ -9,7 +9,18 @@ export default function UpdateProfile() {
   const { user, login } = useAuth();
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
+  interface FormData {
+    username: string;
+    email: string;
+    shortBio: string;
+    goals: string;
+    skills: string[];
+    industry: string;
+    experience: string;
+    availability: string;
+  }
+
+  const [formData, setFormData] = useState<FormData>({
     username: "",
     email: "",
     shortBio: "",
