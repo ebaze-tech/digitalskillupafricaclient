@@ -6,9 +6,10 @@ import { useAuth } from "../authContext";
 import { Loader2 } from "lucide-react";
 
 export default function UpdateProfile() {
-  const { user, login } = useAuth();
+  const { user, login } = useAuth(); // Get current user & login function from auth context
   const navigate = useNavigate();
 
+  // Define form structure
   interface FormData {
     username: string;
     email: string;
@@ -20,6 +21,7 @@ export default function UpdateProfile() {
     availability: string;
   }
 
+  // Initial form state
   const [formData, setFormData] = useState<FormData>({
     username: "",
     email: "",
@@ -33,6 +35,7 @@ export default function UpdateProfile() {
 
   const [loading, setLoading] = useState(false);
 
+  // Available options
   const skillOptions = [
     "UI/UX",
     "Graphic Design",
@@ -47,35 +50,32 @@ export default function UpdateProfile() {
     "Marketing",
     "Content Creation",
   ];
-
   const availabilityOptions = ["Weekly", "Bi-weekly", "Monthly", "As needed"];
 
+  // Determine role and corresponding styles
   const role = user?.role ?? "mentee";
-
-  const textColorMap: Record<string, string> = {
+  const textColorMap = {
     admin: "text-yellow-700",
     mentor: "text-green-700",
     mentee: "text-purple-700",
   };
-
-  const focusRingMap: Record<string, string> = {
+  const focusRingMap = {
     admin: "focus:ring-yellow-400",
     mentor: "focus:ring-green-400",
     mentee: "focus:ring-purple-400",
   };
-
-  const bgGradientMap: Record<string, string> = {
+  const bgGradientMap = {
     admin: "from-yellow-100 via-yellow-200 to-yellow-300",
     mentor: "from-green-100 via-green-200 to-green-300",
     mentee: "from-purple-100 via-purple-200 to-purple-300",
   };
-
-  const buttonColorMap: Record<string, string> = {
+  const buttonColorMap = {
     admin: "bg-yellow-600 hover:bg-yellow-700",
     mentor: "bg-green-600 hover:bg-green-700",
     mentee: "bg-purple-600 hover:bg-purple-700",
   };
 
+  // Populate form with user data on load
   useEffect(() => {
     if (user) {
       setFormData({
@@ -91,6 +91,7 @@ export default function UpdateProfile() {
     }
   }, [user]);
 
+  // Handle input changes
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -99,6 +100,7 @@ export default function UpdateProfile() {
     const { name, value } = e.target;
 
     if (name === "skills") {
+      // Multiple select for skills
       const selected = Array.from(
         (e.target as HTMLSelectElement).selectedOptions
       ).map((o) => o.value);
@@ -108,6 +110,7 @@ export default function UpdateProfile() {
     }
   };
 
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -127,14 +130,16 @@ export default function UpdateProfile() {
         availability: formData.availability || undefined,
       };
 
-      const res = await API.put(`/profile/setup`, payload);
+      const res = await API.put(`/me/profile`, payload);
 
+      // Update auth context and local storage
       const updatedUser = { ...user, ...res.data.user };
       localStorage.setItem("user", JSON.stringify(updatedUser));
       login(updatedUser);
 
       toast.success("Profile updated successfully");
 
+      // Navigate based on user role
       navigate(
         role === "mentor"
           ? "/dashboard/mentor"
@@ -165,7 +170,7 @@ export default function UpdateProfile() {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Read-only fields */}
+          {/* Non-editable fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-gray-700">
@@ -200,10 +205,11 @@ export default function UpdateProfile() {
                 value={formData.shortBio}
                 onChange={handleChange}
                 rows={3}
-                className={`w-full border px-4 py-2 rounded-md focus:outline-none ${focusRingMap[role]}`}
                 required
+                className={`w-full border px-4 py-2 rounded-md focus:outline-none ${focusRingMap[role]}`}
               />
             </div>
+
             <div>
               <label className="text-sm font-medium text-gray-700">Goals</label>
               <textarea
@@ -211,8 +217,8 @@ export default function UpdateProfile() {
                 value={formData.goals}
                 onChange={handleChange}
                 rows={3}
-                className={`w-full border px-4 py-2 rounded-md focus:outline-none ${focusRingMap[role]}`}
                 required
+                className={`w-full border px-4 py-2 rounded-md focus:outline-none ${focusRingMap[role]}`}
               />
             </div>
 
@@ -225,8 +231,8 @@ export default function UpdateProfile() {
                 multiple
                 value={formData.skills}
                 onChange={handleChange}
-                className={`w-full border px-4 py-2 rounded-md h-36 focus:outline-none ${focusRingMap[role]}`}
                 required
+                className={`w-full border px-4 py-2 rounded-md h-36 focus:outline-none ${focusRingMap[role]}`}
               >
                 {skillOptions.map((skill) => (
                   <option key={skill} value={skill}>
@@ -250,8 +256,8 @@ export default function UpdateProfile() {
                   name="industry"
                   value={formData.industry}
                   onChange={handleChange}
-                  className={`w-full border px-4 py-2 rounded-md focus:outline-none ${focusRingMap[role]}`}
                   required
+                  className={`w-full border px-4 py-2 rounded-md focus:outline-none ${focusRingMap[role]}`}
                 />
               </div>
               <div>
@@ -262,8 +268,8 @@ export default function UpdateProfile() {
                   name="experience"
                   value={formData.experience}
                   onChange={handleChange}
-                  className={`w-full border px-4 py-2 rounded-md focus:outline-none ${focusRingMap[role]}`}
                   required
+                  className={`w-full border px-4 py-2 rounded-md focus:outline-none ${focusRingMap[role]}`}
                 />
               </div>
               <div>
@@ -288,6 +294,7 @@ export default function UpdateProfile() {
             </div>
           </div>
 
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}

@@ -3,26 +3,58 @@ import API from "../../axios/axios";
 import { toast } from "react-toastify";
 
 export default function AddUserForm() {
+  // State to manage form input fields
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
     role: "mentee",
   });
+
+  // Loading state to manage submission state
   const [loading, setLoading] = useState(false);
 
+  // Handle form field updates
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Simple regex-based email validation
+  const isValidEmail = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  // Client-side form validation
+  const validateForm = () => {
+    if (formData.username.trim().length < 3) {
+      toast.error("Username must be at least 3 characters long");
+      return false;
+    }
+    if (!isValidEmail(formData.email)) {
+      toast.error("Please enter a valid email");
+      return false;
+    }
+    if (formData.password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return false;
+    }
+    return true;
+  };
+
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Run validations
+    if (!validateForm()) return;
+
     setLoading(true);
     try {
       await API.post("/admin/add-user", formData);
       toast.success("User created successfully");
+
+      // Reset form
       setFormData({
         username: "",
         email: "",
@@ -47,6 +79,7 @@ export default function AddUserForm() {
           Add New User
         </h2>
 
+        {/* Username Field */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Username
@@ -61,6 +94,7 @@ export default function AddUserForm() {
           />
         </div>
 
+        {/* Email Field */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Email
@@ -76,6 +110,7 @@ export default function AddUserForm() {
           />
         </div>
 
+        {/* Password Field */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Password
@@ -91,6 +126,7 @@ export default function AddUserForm() {
           />
         </div>
 
+        {/* Role Dropdown */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Role
@@ -108,6 +144,7 @@ export default function AddUserForm() {
           </select>
         </div>
 
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}

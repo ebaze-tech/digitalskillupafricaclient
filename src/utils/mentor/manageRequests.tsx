@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { Loader2, ThumbsUp, ThumbsDown, Mail, User } from "lucide-react";
 import { useAuth } from "../../authContext";
 
+// Type definition for each incoming mentorship request
 interface MentorshipRequest {
   id: string;
   menteeId: string;
@@ -13,11 +14,12 @@ interface MentorshipRequest {
 }
 
 export default function ManageRequests() {
-  const [requests, setRequests] = useState<MentorshipRequest[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [respondingId, setRespondingId] = useState<string | null>(null);
-  const { user } = useAuth();
+  const [requests, setRequests] = useState<MentorshipRequest[]>([]); // Holds list of incoming requests
+  const [loading, setLoading] = useState(false); // Overall loading state
+  const [respondingId, setRespondingId] = useState<string | null>(null); // Track which request is being responded to
+  const { user } = useAuth(); // Authenticated user (mentor)
 
+  // Fetch incoming mentorship requests for the current user
   useEffect(() => {
     if (!user?.id) return;
 
@@ -38,23 +40,25 @@ export default function ManageRequests() {
     fetchRequests();
   }, [user]);
 
-  const handleRespond = async (
-    requestId: string,
-    status: "accepted" | "rejected"
-  ) => {
-    setRespondingId(requestId);
+  // Handle mentor's response to a mentorship request
+  const handleRespond = async (id: string, status: "accepted" | "rejected") => {
+    setRespondingId(id); // Lock the button while processing
     try {
-      await API.post(`/mentorship/requests/respond/${requestId}`, { status });
+      // Send response to backend
+      await API.post(`/mentorship/requests/${id}`, { status });
       toast.success(`Request ${status}`);
-      const response = await API.get(`/mentorship/incoming/${user?.id}`);
+
+      // Refresh request list after responding
+      const response = await API.get(`/mentorship/sessions/mentor/${user?.id}`);
       setRequests(response.data || []);
     } catch (err: any) {
       toast.error(err.response?.data?.error || "Failed to respond");
     } finally {
-      setRespondingId(null);
+      setRespondingId(null); // Reset the responding state
     }
   };
 
+  // Show loader if user is still being fetched
   if (!user) {
     return (
       <div className="text-center py-6">
@@ -70,21 +74,25 @@ export default function ManageRequests() {
         Incoming Mentorship Requests
       </h2>
 
+      {/* Loader while requests are loading */}
       {loading ? (
         <div className="flex justify-center py-12">
           <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
         </div>
       ) : requests.length === 0 ? (
+        // If no requests
         <p className="text-gray-600 text-center">
           You have no mentorship requests at this time.
         </p>
       ) : (
+        // List of requests
         <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {requests.map((req) => (
             <div
               key={req.id}
               className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col justify-between hover:shadow-md transition"
             >
+              {/* Requester's info */}
               <div className="space-y-2 mb-4">
                 <div className="flex items-center gap-2 text-lg font-semibold text-gray-800">
                   <User className="w-5 h-5 text-indigo-500" />
@@ -96,8 +104,10 @@ export default function ManageRequests() {
                 </div>
               </div>
 
+              {/* Action buttons or status tag */}
               <div className="mt-auto">
                 {req.status === "pending" ? (
+                  // If still pending, show Accept and Reject buttons
                   <div className="flex flex-col sm:flex-row gap-2">
                     <button
                       onClick={() => handleRespond(req.id, "accepted")}
@@ -130,6 +140,7 @@ export default function ManageRequests() {
                     </button>
                   </div>
                 ) : (
+                  // If already responded, show status tag
                   <div
                     className={`text-sm font-semibold px-3 py-1 rounded-full w-fit mt-2 ${
                       req.status === "accepted"

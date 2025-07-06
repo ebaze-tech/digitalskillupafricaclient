@@ -8,9 +8,10 @@ import {
   Briefcase,
   Clock,
   BadgeCheck,
-  // Calendar,
+  Calendar,
 } from "lucide-react";
 
+// Define the mentee type shape expected from the API
 interface Mentee {
   id: string;
   username: string;
@@ -22,13 +23,16 @@ interface Mentee {
 }
 
 export default function AssignedMentees() {
+  // Store the list of mentees assigned to this mentor
   const [mentees, setMentees] = useState<Mentee[]>([]);
+  // Get current logged-in user info from auth context
   const { user } = useAuth();
 
+  // Fetch assigned mentees once user is available
   useEffect(() => {
     const fetchAssignedMentees = async () => {
       try {
-        const response = await API.get("/mentorship/assigned-mentees");
+        const response = await API.get("/mentorship/requests/received");
         setMentees(response.data || []);
         toast.success("Assigned mentees loaded");
       } catch (error: any) {
@@ -46,11 +50,12 @@ export default function AssignedMentees() {
   }, [user?.id]);
 
   return (
-    <div className="max-w-6xl p-0 bg-white rounded-xl shadow ">
+    <div className="max-w-6xl p-0 bg-white rounded-xl shadow">
       <h3 className="text-2xl font-bold mb-6 text-center text-gray-800">
         Your Assigned Mentees
       </h3>
 
+      {/* Show a message if no mentees are assigned */}
       {mentees.length === 0 ? (
         <p className="text-gray-600 text-center">
           You have no assigned mentees.
@@ -62,6 +67,7 @@ export default function AssignedMentees() {
               key={m.id}
               className="border border-gray-200 p-5 rounded-lg bg-gray-50 hover:shadow-md transition space-y-3"
             >
+              {/* Top: Name and role badge */}
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2 text-lg font-semibold text-gray-800">
                   <User className="w-5 h-5 text-indigo-600" />
@@ -73,31 +79,35 @@ export default function AssignedMentees() {
                 </span>
               </div>
 
+              {/* Email */}
               <div className="flex items-center gap-2 text-sm text-gray-700 break-all">
                 <Mail className="w-4 h-4 text-gray-500" />
                 {m.email}
               </div>
 
+              {/* Industry */}
               <div className="flex items-center gap-2 text-sm text-gray-700">
                 <Briefcase className="w-4 h-4 text-gray-500" />
                 Industry: {m.industry || "N/A"}
               </div>
 
+              {/* Experience */}
               <div className="flex items-center gap-2 text-sm text-gray-700">
                 <Clock className="w-4 h-4 text-gray-500" />
                 Experience: {m.experience || "N/A"}
               </div>
 
-              {/* {m.createdAt && (
-                <Calendar className="text-xs h-5 w-3 text-gray-500 text-right">
+              {m.createdAt && (
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <Calendar className="w-4 h-4" />
                   Assigned on:{" "}
                   {new Date(m.createdAt).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "short",
                     day: "numeric",
                   })}
-                </Calendar>
-              )} */}
+                </div>
+              )}
             </div>
           ))}
         </div>

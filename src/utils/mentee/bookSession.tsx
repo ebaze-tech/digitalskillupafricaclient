@@ -3,21 +3,39 @@ import { toast } from "react-toastify";
 import API from "../../axios/axios";
 
 interface Props {
-  mentorId: string;
+  mentorId: string; // ID of the mentor passed as a prop
 }
 
 export default function BookSession({ mentorId }: Props) {
+  // State for form inputs
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Validate if end time is after start time
+  const isTimeValid = () => {
+    return startTime < endTime;
+  };
+
+  // Handle session booking form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Basic client-side validation
+    if (!date || !startTime || !endTime) {
+      return toast.error("All fields are required.");
+    }
+
+    if (!isTimeValid()) {
+      return toast.error("End time must be after start time.");
+    }
+
     setLoading(true);
 
     try {
-      const response = await API.post("/mentorship/book-session", {
+      // Send POST request to backend
+      const response = await API.post("/mentorship/sessions", {
         mentorId,
         date,
         start_time: startTime,
@@ -25,6 +43,8 @@ export default function BookSession({ mentorId }: Props) {
       });
 
       toast.success(response?.data?.message || "Session booked!");
+
+      // Reset form after success
       setDate("");
       setStartTime("");
       setEndTime("");
@@ -42,7 +62,7 @@ export default function BookSession({ mentorId }: Props) {
       onSubmit={handleSubmit}
       className="mt-4 p-4 bg-indigo-50/50 border border-indigo-100 rounded-lg flex flex-col gap-4 w-full"
     >
-      {/* Date */}
+      {/* Date Picker */}
       <div className="w-full">
         <label
           htmlFor="session-date"
@@ -60,9 +80,9 @@ export default function BookSession({ mentorId }: Props) {
         />
       </div>
 
-      {/* Times */}
-      <div className="flex flex-col gap-4 ">
-        <div className="w-full ">
+      {/* Start and End Time Fields */}
+      <div className="flex flex-col gap-4">
+        <div className="w-full">
           <label
             htmlFor="start-time"
             className="block text-sm font-medium text-gray-700 mb-1 text-center"
@@ -97,7 +117,7 @@ export default function BookSession({ mentorId }: Props) {
         </div>
       </div>
 
-      {/* Submit */}
+      {/* Submit Button */}
       <div className="flex flex-col items-center justify-center text-center">
         <button
           type="submit"
