@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import API from "../../axios/axios";
 import { toast } from "react-toastify";
 
+// List of all days in order
 const allDays = [
   "Monday",
   "Tuesday",
@@ -12,6 +13,7 @@ const allDays = [
   "Sunday",
 ];
 
+// Type for representing a single day's availability
 interface Availability {
   day: string;
   start: string;
@@ -19,11 +21,12 @@ interface Availability {
 }
 
 export default function MentorAvailabilityForm() {
-  const [availability, setAvailability] = useState<Availability[]>([]);
-  const [selectedDay, setSelectedDay] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState<boolean | null>(null);
+  const [availability, setAvailability] = useState<Availability[]>([]); // State to hold all selected availability slots
+  const [selectedDay, setSelectedDay] = useState(""); // Selected day to be added
+  const [loading, setLoading] = useState(false); // Submit button loading state
+  const [success, setSuccess] = useState<boolean | null>(null); // Indicates save result (success/fail)
 
+  // Fetch mentor's current availability on mount
   useEffect(() => {
     const fetchMentorAvailability = async () => {
       try {
@@ -34,6 +37,7 @@ export default function MentorAvailabilityForm() {
             start: slot.start_time,
             end: slot.end_time,
           }))
+          // Sort the data based on day order (Mon–Sun)
           .sort(
             (a: { day: string }, b: { day: string }) =>
               allDays.indexOf(a.day) - allDays.indexOf(b.day)
@@ -45,9 +49,11 @@ export default function MentorAvailabilityForm() {
         toast.error(message);
       }
     };
+
     fetchMentorAvailability();
   }, []);
 
+  // Add a new day slot if not already added
   const handleAddDay = () => {
     if (selectedDay && !availability.some((a) => a.day === selectedDay)) {
       setAvailability([
@@ -58,10 +64,12 @@ export default function MentorAvailabilityForm() {
     }
   };
 
+  // Remove a day from the availability list
   const handleRemoveDay = (day: string) => {
     setAvailability((prev) => prev.filter((a) => a.day !== day));
   };
 
+  // Update start or end time for a specific day
   const updateDayTime = (
     day: string,
     field: "start" | "end",
@@ -72,13 +80,16 @@ export default function MentorAvailabilityForm() {
     );
   };
 
+  // Validate that the start time is before end time
   const isTimeRangeValid = (start: string, end: string) => start < end;
 
+  // Submit the availability form
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setSuccess(null);
 
+    // Check if any slot has invalid time range
     const invalidSlot = availability.find(
       (a) => a.start && a.end && !isTimeRangeValid(a.start, a.end)
     );
@@ -92,8 +103,10 @@ export default function MentorAvailabilityForm() {
     }
 
     try {
+      // Clear previous availability first
       await API.delete("/mentorship/availability");
 
+      // Save each valid availability slot
       const validSlots = availability.filter((a) => a.start && a.end);
       for (const slot of validSlots) {
         await API.post("/mentorship/availability", {
@@ -106,6 +119,7 @@ export default function MentorAvailabilityForm() {
       toast.success("Availability saved successfully!");
       setSuccess(true);
 
+      // Reload the page to reflect updates
       setTimeout(() => {
         window.location.reload();
       }, 1000);
@@ -119,6 +133,7 @@ export default function MentorAvailabilityForm() {
     }
   };
 
+  // Days not yet selected
   const remainingDays = allDays.filter(
     (d) => !availability.some((a) => a.day === d)
   );
@@ -130,6 +145,7 @@ export default function MentorAvailabilityForm() {
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-6 w-full">
+        {/* Render availability slots */}
         {availability.map((slot) => (
           <div
             key={slot.day}
@@ -163,6 +179,7 @@ export default function MentorAvailabilityForm() {
           </div>
         ))}
 
+        {/* Add new day slot */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
           <select
             value={selectedDay}
@@ -186,6 +203,7 @@ export default function MentorAvailabilityForm() {
           </button>
         </div>
 
+        {/* Submit button */}
         <div className="pt-4 text-center md:text-left">
           <button
             type="submit"
@@ -195,6 +213,7 @@ export default function MentorAvailabilityForm() {
             {loading ? "Saving..." : "Save Availability"}
           </button>
 
+          {/* Error message if save fails */}
           {success === false && (
             <p className="text-red-600 mt-2 text-sm">
               Failed to save availability.

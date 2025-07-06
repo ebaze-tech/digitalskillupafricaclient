@@ -3,6 +3,7 @@ import API from "../../axios/axios";
 import { toast } from "react-toastify";
 import BookSession from "./bookSession";
 
+// Define the expected structure of a mentor object
 interface Mentor {
   mentorId: string;
   username: string;
@@ -15,17 +16,24 @@ interface Mentor {
 }
 
 export default function ViewMentors() {
+  // Store fetched mentors
   const [mentors, setMentors] = useState<Mentor[]>([]);
+  // State for filtering
   const [skill, setSkill] = useState("");
   const [industry, setIndustry] = useState("");
+  // Loading state for fetch
   const [loading, setLoading] = useState(false);
+  // Status map for mentorship request per mentor
   const [requestStatuses, setRequestStatuses] = useState<
     Record<string, string>
   >({});
 
+  // Fetch mentors with optional skill/industry filters
   const fetchMentors = async () => {
     try {
       setLoading(true);
+
+      // Build query params dynamically
       const query = new URLSearchParams();
       if (skill) query.append("skill", skill);
       if (industry) query.append("industry", industry);
@@ -40,10 +48,11 @@ export default function ViewMentors() {
       setLoading(false);
     }
   };
+
+  // Fetch request statuses for mentors to know if a request has been sent/accepted/rejected
   const fetchRequests = async () => {
     try {
       const res = await API.get("/mentorship/request-to-mentor");
-      console.log(res.data);
       const statusMap: Record<string, string> = {};
       res.data.forEach((req: any) => {
         statusMap[req.mentorId] = req.status;
@@ -53,21 +62,26 @@ export default function ViewMentors() {
       console.error("Failed to fetch mentorship requests");
     }
   };
+
+  // Fetch mentors and request statuses on component mount
   useEffect(() => {
     fetchMentors();
     fetchRequests();
   }, []);
 
+  // Handle sending mentorship request
   const handleRequest = async (mentorId: string) => {
     try {
       await API.post("/mentorship/request", { mentorId });
       toast.success("Mentorship request sent!");
+      fetchRequests(); // Update the UI with latest status
     } catch (error: any) {
       const msg = error?.response?.data?.error || "Failed to send request";
       toast.error(msg);
     }
   };
 
+  // Handle filter/search form submit
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     fetchMentors();
@@ -75,7 +89,7 @@ export default function ViewMentors() {
 
   return (
     <div className="max-w-7xl mx-auto w-full overflow-hidden">
-      {/* Filter Form */}
+      {/* Filter/Search Form */}
       <form
         onSubmit={handleSearch}
         className="flex flex-col md:flex-row md:items-center gap-4 mb-10"
@@ -103,7 +117,7 @@ export default function ViewMentors() {
         </button>
       </form>
 
-      {/* Mentor Cards */}
+      {/* Mentor Cards Section */}
       {mentors.length === 0 && !loading ? (
         <p className="text-center text-red-600 font-medium">
           No mentors found.
@@ -115,6 +129,7 @@ export default function ViewMentors() {
               key={mentor.id}
               className="flex flex-col justify-between h-full bg-white p-5 border rounded-xl shadow-sm hover:shadow-md transition overflow-hidden"
             >
+              {/* Mentor Info */}
               <div className="space-y-3 mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">
                   {mentor.username}
@@ -136,6 +151,7 @@ export default function ViewMentors() {
                 </p>
               </div>
 
+              {/* Request Button & Booking Form */}
               <div className="flex flex-col gap-3">
                 {requestStatuses[mentor.id] ? (
                   <button
@@ -163,6 +179,7 @@ export default function ViewMentors() {
                   </button>
                 )}
 
+                {/* Booking Component */}
                 <BookSession mentorId={mentor.id} />
               </div>
             </div>

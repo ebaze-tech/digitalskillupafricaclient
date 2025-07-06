@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { useAuth } from "../../authContext";
 import { Loader2, User2, Mail, Link2 } from "lucide-react";
 
+// User object type definition
 interface User {
   id: string;
   username: string;
@@ -11,30 +12,36 @@ interface User {
   role: string;
 }
 
+// Structure for a mentor-mentee assignment
 interface Assignment {
   menteeId: string;
   mentorId: string;
-  username: string;
-  email: string;
+  username: string; // mentor's username
+  email: string; // mentor's email
 }
 
 export default function AdminAssignMentor() {
+  // All users (mentors and mentees)
   const [users, setUsers] = useState<User[]>([]);
-  const [assignments, setAssignments] = useState<Record<string, Assignment>>(
-    {}
-  );
+  // Map of assignments keyed by menteeId
+  const [assignments, setAssignments] = useState<Record<string, Assignment>>({});
+  // Controls loading state
   const [isLoading, setIsLoading] = useState(false);
 
+  // Get logged-in admin info from auth context
   const { user } = useAuth();
   const adminId = user?.id;
 
+  // Filter mentors and mentees from users
   const mentors = users.filter((u) => u.role === "mentor");
   const mentees = users.filter((u) => u.role === "mentee");
 
+  // Fetch users and their existing assignments on component mount
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
+        // Fetch users and current mentorship matches
         const [usersRes, assignmentsRes] = await Promise.all([
           API.get("/admin/users"),
           API.get("/admin/mentorship-match"),
@@ -42,6 +49,7 @@ export default function AdminAssignMentor() {
 
         setUsers(usersRes.data);
 
+        // Format assignments into a keyed object for quick lookup
         const formatted: Record<string, Assignment> = {};
         assignmentsRes.data.forEach((a: any) => {
           formatted[a.menteeId] = {
@@ -65,6 +73,7 @@ export default function AdminAssignMentor() {
     fetchData();
   }, []);
 
+  // Assign a mentor to a mentee
   const handleAssign = async (menteeId: string, mentorId: string) => {
     if (!adminId) return toast.error("Admin not logged in.");
 
@@ -75,7 +84,10 @@ export default function AdminAssignMentor() {
         adminId,
       });
 
+      // Find mentor being assigned
       const assignedMentor = mentors.find((m) => m.id === mentorId);
+
+      // Update assignment state
       if (assignedMentor) {
         setAssignments((prev) => ({
           ...prev,
@@ -103,14 +115,17 @@ export default function AdminAssignMentor() {
         Assign Mentors to Mentees
       </h2>
 
+      {/* Loading State */}
       {isLoading ? (
         <div className="flex justify-center items-center text-gray-500 py-10 gap-2">
           <Loader2 className="w-6 h-6 animate-spin" />
           <span>Loading users...</span>
         </div>
       ) : mentees.length === 0 ? (
+        // No mentees available
         <p className="text-center text-gray-500">No mentees available.</p>
       ) : (
+        // List of mentees with assignment dropdown
         <div className="space-y-5">
           {mentees.map((mentee) => {
             const assigned = assignments[mentee.id];
@@ -120,22 +135,26 @@ export default function AdminAssignMentor() {
                 className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 flex-wrap">
-                  {/* Mentee Info */}
+                  {/* Mentee Info Section */}
                   <div className="flex-1 min-w-0 space-y-2">
+                    {/* Username */}
                     <div className="flex items-center gap-2 text-lg font-semibold text-gray-800 break-words">
                       <User2 className="w-5 h-5 text-indigo-600 shrink-0" />
                       <span className="truncate">{mentee.username}</span>
                     </div>
 
+                    {/* Email */}
                     <div className="flex flex-wrap items-center gap-2 text-sm text-gray-700 break-words">
                       <Mail className="w-4 h-4 text-gray-500 shrink-0" />
                       <span className="truncate">{mentee.email}</span>
                     </div>
 
+                    {/* Role badge */}
                     <div className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full inline-block w-fit">
                       Role: {mentee.role}
                     </div>
 
+                    {/* Existing assignment info */}
                     {assigned && (
                       <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-green-700 break-words">
                         <Link2 className="w-4 h-4 text-green-600 shrink-0" />
@@ -148,7 +167,7 @@ export default function AdminAssignMentor() {
                     )}
                   </div>
 
-                  {/* Mentor Select */}
+                  {/* Mentor selection dropdown */}
                   <div className="w-full sm:w-64">
                     <select
                       value={assigned?.mentorId || ""}

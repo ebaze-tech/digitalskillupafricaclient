@@ -4,16 +4,24 @@ import { toast } from "react-toastify";
 import { useParams, useNavigate } from "react-router-dom";
 
 export default function EditUserForm() {
+  // Form data state
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
     role: "mentee",
   });
+
+  // Loading state for form submission
   const [loading, setLoading] = useState(false);
+
+  // Get user ID from route parameters
   const { id } = useParams<{ id: string }>();
+
+  // Navigation after update
   const navigate = useNavigate();
 
+  // Fetch user data on mount
   useEffect(() => {
     const fetchUser = async () => {
       if (!id) return;
@@ -22,7 +30,7 @@ export default function EditUserForm() {
         setFormData({
           username: data.username,
           email: data.email,
-          password: "",
+          password: "", // Leave password empty
           role: data.role,
         });
       } catch (err) {
@@ -32,17 +40,43 @@ export default function EditUserForm() {
     fetchUser();
   }, [id]);
 
+  // Handle input field changes
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Email validation using regex
+  const isValidEmail = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  // Form validation function
+  const validateForm = () => {
+    if (!formData.username.trim() || formData.username.length < 3) {
+      toast.error("Username must be at least 3 characters");
+      return false;
+    }
+    if (!isValidEmail(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return false;
+    }
+    if (formData.password && formData.password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return false;
+    }
+    return true;
+  };
+
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateForm()) return;
+
     setLoading(true);
     try {
-      await API.put(`/admin/edit-user/${id}`, formData);
+      await API.put(`/admin/users/${id}/role`, formData);
       toast.success("User updated successfully");
       navigate("/dashboard/admin/users");
     } catch (error: any) {
@@ -53,6 +87,7 @@ export default function EditUserForm() {
     }
   };
 
+  // Show error if ID is invalid
   if (!id) {
     return (
       <p className="text-red-500 font-semibold text-center px-4 mt-6">
@@ -67,7 +102,9 @@ export default function EditUserForm() {
         Edit User
       </h2>
 
+      {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Username Field */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Username
@@ -82,6 +119,7 @@ export default function EditUserForm() {
           />
         </div>
 
+        {/* Email Field */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Email
@@ -97,6 +135,7 @@ export default function EditUserForm() {
           />
         </div>
 
+        {/* Password Field */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             New Password
@@ -111,6 +150,7 @@ export default function EditUserForm() {
           />
         </div>
 
+        {/* Role Select */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Role
@@ -127,6 +167,7 @@ export default function EditUserForm() {
           </select>
         </div>
 
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
