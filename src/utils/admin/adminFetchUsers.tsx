@@ -92,7 +92,7 @@ export default function AdminFetchUsers() {
               </div>
 
               {/* Edit button linking to the edit user page */}
-              <Link to={`/dashboard/admin/edit/${user.id}`}>
+              <Link to={`/admin/user/edit/${user.id}`}>
                 <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition cursor-pointer">
                   Edit User
                 </button>

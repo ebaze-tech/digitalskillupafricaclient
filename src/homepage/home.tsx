@@ -48,7 +48,7 @@ const HomePage: React.FC = () => {
                   label="Dashboard"
                   onClick={() => {
                     if (user.role === "admin") {
-                      navigate("/dashboard/admin");
+                      navigate("/admin");
                     } else if (user.role === "mentor") {
                       navigate("/dashboard/mentor");
                     } else if (user.role === "mentee") {
@@ -100,7 +100,7 @@ const HomePage: React.FC = () => {
                   label="Dashboard"
                   onClick={() => {
                     if (user.role === "admin") {
-                      navigate("/dashboard/admin");
+                      navigate("/admin");
                     } else if (user.role === "mentor") {
                       navigate("/dashboard/mentor");
                     } else if (user.role === "mentee") {

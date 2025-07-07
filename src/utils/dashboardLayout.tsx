@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../authContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Outlet } from "react-router-dom";
 import {
   LogOut,
   User,
@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 interface Props {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export default function DashboardLayout({ children }: Props) {
@@ -41,27 +41,27 @@ export default function DashboardLayout({ children }: Props) {
         return (
           <>
             <DashboardLink
-              href="/dashboard/admin"
+              href="/admin"
               icon={<Home size={18} />}
               label="Home"
             />
             <DashboardLink
-              href="/dashboard/admin/users"
+              href="/admin/users"
               icon={<User size={18} />}
               label="Manage Users"
             />
             <DashboardLink
-              href="/dashboard/admin/assign-mentor"
+              href="/admin/matches/assign"
               icon={<UserPlus2 size={18} />}
               label="Assign Mentor"
             />
             <DashboardLink
-              href="/dashboard/admin/sessions"
+              href="/admin/sessions"
               icon={<Calendar size={18} />}
               label="View Sessions"
             />
             <DashboardLink
-              href="/dashboard/admin/mentorship-match"
+              href="/admin/matches"
               icon={<EyeIcon size={18} />}
               label="Mentorship Match"
             />
@@ -101,9 +101,14 @@ export default function DashboardLayout({ children }: Props) {
               label="Dashboard"
             />
             <DashboardLink
-              href="/dashboard/mentee/view-mentors"
+              href="/dashboard/mentee/mentors"
               icon={<UserPlus2 size={18} />}
               label="Connect Mentor"
+            />
+            <DashboardLink
+              href="/dashboard/mentee/my-sessions"
+              icon={<Calendar size={18} />}
+              label="My Sessions"
             />
           </>
         );
@@ -174,7 +179,7 @@ export default function DashboardLayout({ children }: Props) {
 
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-8 mt-16 md:mt-0 overflow-y-auto">
-        <div className="max-w-7xl mx-auto">{children}</div>
+        <div className="max-w-7xl mx-auto">{children ?? <Outlet />}</div>
       </main>
     </div>
   );
