@@ -22,7 +22,7 @@ export default function MentorUpcomingSessions() {
     const fetchSessions = async () => {
       setLoading(true);
       try {
-        const res = await API.get("/mentorship/sessions/mentee");
+        const res = await API.get("/mentorship/sessions/mentor");
         toast.success("Upcoming sessions data fetched successfully");
         setSessions(res.data); // Update state with fetched sessions
       } catch (error: any) {
@@ -37,7 +37,7 @@ export default function MentorUpcomingSessions() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
-      <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
+      <h2 className="text-3xl font-bold text-center text-black mb-8">
         Upcoming Sessions
       </h2>
 

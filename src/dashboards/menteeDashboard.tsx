@@ -27,9 +27,9 @@ export default function MenteeDashboard() {
           <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6">
             <ViewMentors />
           </div>
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6">
-            <MenteeUpcomingSessions />
-          </div>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6">
+          <MenteeUpcomingSessions />
         </div>
       </div>
     </div>

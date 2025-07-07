@@ -130,7 +130,7 @@ export default function UpdateProfile() {
         availability: formData.availability || undefined,
       };
 
-      const res = await API.put(`/me/profile`, payload);
+      const res = await API.put(`/users/me/profile`, payload);
 
       // Update auth context and local storage
       const updatedUser = { ...user, ...res.data.user };

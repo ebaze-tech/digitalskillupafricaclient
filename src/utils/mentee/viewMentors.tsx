@@ -52,7 +52,7 @@ export default function ViewMentors() {
   // Fetch request statuses for mentors to know if a request has been sent/accepted/rejected
   const fetchRequests = async () => {
     try {
-      const res = await API.get("/mentorship/request-to-mentor");
+      const res = await API.get("/mentorship/requests/sent");
       const statusMap: Record<string, string> = {};
       res.data.forEach((req: any) => {
         statusMap[req.mentorId] = req.status;
