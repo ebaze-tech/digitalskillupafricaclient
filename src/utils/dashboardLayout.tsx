@@ -156,7 +156,7 @@ export default function DashboardLayout({ children }: Props) {
         <div className="mt-10 space-y-4">
           <button
             onClick={handleEditProfile}
-            className="flex items-center gap-2 px-3 py-2 rounded border-2 border-black bg-inherit text-black w-full hover:bg-gray-100 transition"
+            className="flex items-center gap-2 px-3 py-2 rounded border-2 border-black bg-inherit text-black w-full hover:bg-white/10 transition cursor-pointer"
           >
             <FileEditIcon size={18} />
             Edit Profile
@@ -164,7 +164,7 @@ export default function DashboardLayout({ children }: Props) {
 
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 px-3 py-2 rounded bg-red-500 text-black w-full hover:bg-red-600 transition"
+            className="flex items-center gap-2 px-3 py-2 rounded bg-red-500 text-black w-full hover:bg-red-600 transition cursor-pointer"
           >
             <LogOut size={18} />
             Logout
