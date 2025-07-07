@@ -3,7 +3,6 @@ import { AuthProvider } from "./authContext";
 import HomePage from "./homepage/home";
 import RegisterPage from "./auth/register";
 import LoginPage from "./auth/login";
-import "./App.css";
 import DashboardLayout from "./utils/dashboardLayout";
 import AdminDashboard from "./dashboards/adminDashboard";
 import { ToastContainer } from "react-toastify";
@@ -14,7 +13,6 @@ import AdminViewSessions from "./utils/admin/adminViewSessions";
 import MentorDashboard from "./dashboards/mentorDashboard";
 import MenteeDashboard from "./dashboards/menteeDashboard";
 import UpdateProfile from "./utils/updateProfile";
-import "react-toastify/dist/ReactToastify.css";
 import MentorAvailabilityForm from "./utils/mentor/mentorAvailabilityForm";
 import ManageRequests from "./utils/mentor/manageRequests";
 import ViewMentors from "./utils/mentee/viewMentors";
@@ -24,7 +22,9 @@ import AssignedMentees from "./utils/mentor/assignedMentee";
 import AdminMentorshipMatches from "./utils/admin/viewAllMentorshipMatch";
 import MentorUpcomingSessions from "./utils/mentor/upcomingSessions";
 import MenteeUpcomingSessions from "./utils/mentee/upcomingSession";
-// import SessionBookingForm from "./utils/sessionBookingForm";
+
+import "./App.css";
+import "react-toastify/dist/ReactToastify.css";
 
 function AppRoutes() {
   return (
