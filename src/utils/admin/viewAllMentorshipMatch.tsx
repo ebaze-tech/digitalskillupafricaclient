@@ -43,6 +43,9 @@ export default function AdminMentorshipMatches() {
 
     fetchMatches();
   }, []); // Empty dependency array ensures this runs once on mount
+  const validMatches = matches.filter(
+    (match) => match.menteeId && match.mentorId
+  );
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
@@ -65,7 +68,7 @@ export default function AdminMentorshipMatches() {
       ) : (
         // Display matches in a responsive grid
         <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2">
-          {matches.map((match) => (
+          {validMatches.map((match) => (
             <div
               key={`${match.menteeId}-${match.mentorId}`} // Unique key based on pair
               className="bg-white border border-gray-200 shadow-sm rounded-lg p-5 hover:shadow-md transition"
@@ -78,6 +81,9 @@ export default function AdminMentorshipMatches() {
                 </h3>
                 <p className="text-sm text-gray-700 pl-7">
                   <strong>Name:</strong> {match.mentee_username}
+                </p>
+                <p className="text-sm text-gray-700 pl-7">
+                  <strong>ID:</strong> {match.menteeId}
                 </p>
                 <p className="text-sm text-gray-600 pl-7">
                   <Mail className="inline w-4 h-4 mr-1 text-gray-500" />
@@ -93,6 +99,9 @@ export default function AdminMentorshipMatches() {
                 </h3>
                 <p className="text-sm text-gray-700 pl-7">
                   <strong>Name:</strong> {match.mentor_username}
+                </p>
+                <p className="text-sm text-gray-700 pl-7">
+                  <strong>ID:</strong> {match.mentorId}
                 </p>
                 <p className="text-sm text-gray-600 pl-7">
                   <Mail className="inline w-4 h-4 mr-1 text-gray-500" />

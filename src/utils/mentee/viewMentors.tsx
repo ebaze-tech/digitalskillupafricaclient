@@ -72,7 +72,7 @@ export default function ViewMentors() {
   // Handle sending mentorship request
   const handleRequest = async (mentorId: string) => {
     try {
-      await API.post("/mentorship/request", { mentorId });
+      await API.post("/mentorship/requests", { mentorId });
       toast.success("Mentorship request sent!");
       fetchRequests(); // Update the UI with latest status
     } catch (error: any) {

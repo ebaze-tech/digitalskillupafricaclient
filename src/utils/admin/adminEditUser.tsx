@@ -78,7 +78,7 @@ export default function EditUserForm() {
     try {
       await API.put(`/admin/users/${id}/role`, formData);
       toast.success("User updated successfully");
-      navigate("/dashboard/admin/users");
+      navigate("/admin/users");
     } catch (error: any) {
       const message = error?.response?.data?.error || "Error updating user";
       toast.error(message);

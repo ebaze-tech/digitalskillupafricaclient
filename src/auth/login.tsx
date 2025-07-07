@@ -41,12 +41,12 @@ export default function LoginPage() {
 
       if (needsProfileUpdate) {
         toast.info("Please complete your profile to continue.");
-        return navigate("/update-profile");
+        return navigate("/profile/edit");
       }
 
       switch (user.role) {
         case "admin":
-          navigate("/dashboard/admin");
+          navigate("/admin");
           break;
         case "mentor":
           navigate("/dashboard/mentor");

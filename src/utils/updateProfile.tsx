@@ -145,7 +145,7 @@ export default function UpdateProfile() {
           ? "/dashboard/mentor"
           : role === "mentee"
           ? "/dashboard/mentee"
-          : "/dashboard/admin"
+          : "/admin"
       );
     } catch (error: any) {
       toast.error(
